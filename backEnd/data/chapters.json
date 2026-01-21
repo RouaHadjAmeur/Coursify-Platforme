@@ -1,0 +1,331 @@
+[
+  {
+    "id": "chapter_1758370561166_0fc0no6qh",
+    "title": "Getting Started with HTML",
+    "content": "Introduction to the structure of web pages",
+    "lessonId": "test_lesson_1",
+    "order": 1,
+    "duration": "15",
+    "videoUrl": "https://youtu.be/bWPMSSsVdPk",
+    "isPublished": true,
+    "createdAt": "2025-09-20T12:16:01.168Z"
+  },
+  {
+    "id": "chapter_1758370654842_r3huwpwja",
+    "title": "What is HTML?",
+    "content": "HTML stands for HyperText Markup Language. It is the standard markup language for creating web pages.",
+    "lessonId": "test_lesson_1",
+    "order": 2,
+    "duration": "2",
+    "videoUrl": "",
+    "isPublished": true,
+    "createdAt": "2025-09-20T12:17:34.843Z"
+  },
+  {
+    "id": "chapter_1758652523420_o2e1b4bas",
+    "title": "routing1",
+    "description": "",
+    "lessonId": "test_lesson_1",
+    "order": 0,
+    "duration": "0 min",
+    "sections": [
+      {
+        "id": "section_1758652523420_obu8h8gk7",
+        "type": "text",
+        "content": "file-1758652523347-433811539.docx",
+        "filePath": "uploads\\chapters\\file-1758652523347-433811539.docx",
+        "originalName": "routing1.docx",
+        "fileSize": 2780765,
+        "uploadedAt": "2025-09-23T18:35:23.420Z"
+      }
+    ],
+    "createdAt": "2025-09-23T18:35:23.421Z",
+    "updatedAt": "2025-09-23T18:48:24.173Z",
+    "isPublished": true
+  },
+  {
+    "id": "chapter_1758652615732_ng7txxetr",
+    "title": "test chapters",
+    "description": "",
+    "lessonId": "test_lesson_1",
+    "order": 3,
+    "duration": "0 min",
+    "sections": [
+      {
+        "type": "video",
+        "content": "https://youtu.be/bWPMSSsVdPk"
+      }
+    ],
+    "createdAt": "2025-09-23T18:36:55.733Z",
+    "updatedAt": "2025-09-23T18:48:27.897Z",
+    "isPublished": true
+  },
+  {
+    "id": "chapter_1758896006103_egmx5xfb3",
+    "title": "sprint 1",
+    "description": "",
+    "lessonId": "lesson_1758895928772_m8f6r0y8b",
+    "order": 0,
+    "duration": "0 min",
+    "sections": [
+      {
+        "id": "section_1758896006103_thy0ud9wz",
+        "type": "pdf",
+        "content": "file-1758896006030-101745356.pdf",
+        "filePath": "uploads\\chapters\\file-1758896006030-101745356.pdf",
+        "originalName": "sprint 1.pdf",
+        "fileSize": 1029026,
+        "uploadedAt": "2025-09-26T14:13:26.103Z"
+      }
+    ],
+    "createdAt": "2025-09-26T14:13:26.104Z",
+    "updatedAt": "2025-09-26T14:14:14.560Z",
+    "isPublished": true
+  },
+  {
+    "id": "chapter_1758896043559_0dlif1lf5",
+    "title": "test chapters",
+    "description": "",
+    "lessonId": "lesson_1758895928772_m8f6r0y8b",
+    "order": 1,
+    "duration": "2",
+    "sections": [
+      {
+        "type": "video",
+        "content": "https://youtu.be/bWPMSSsVdPk"
+      }
+    ],
+    "createdAt": "2025-09-26T14:14:03.560Z",
+    "updatedAt": "2025-09-26T14:14:13.216Z",
+    "isPublished": true
+  },
+  {
+    "id": "chapter_1758898472559_nkfd0vrns",
+    "title": "Cours_Architecture_matérielle_de_lordinateur",
+    "description": "",
+    "lessonId": "lesson_1758895928772_m8f6r0y8b",
+    "order": 0,
+    "duration": "0 min",
+    "sections": [
+      {
+        "id": "section_1758898472559_u8iky6t5p",
+        "type": "pdf",
+        "content": "file-1758898472503-211292979.pdf",
+        "filePath": "uploads\\chapters\\file-1758898472503-211292979.pdf",
+        "originalName": "Cours_Architecture_matÃ©rielle_de_lordinateur.pdf",
+        "fileSize": 1640843,
+        "uploadedAt": "2025-09-26T14:54:32.559Z"
+      }
+    ],
+    "createdAt": "2025-09-26T14:54:32.561Z",
+    "updatedAt": "2025-09-26T14:54:32.559Z"
+  },
+  {
+    "id": "chapter_1758981903538_qn0b8ak1u",
+    "title": "XML",
+    "description": "",
+    "lessonId": "lesson_1758895978069_414zfrd1o",
+    "order": 0,
+    "duration": "0 min",
+    "sections": [
+      {
+        "id": "section_1758981903538_ds7qs1a6y",
+        "type": "pdf",
+        "content": "file-1758981903485-776280882.pdf",
+        "filePath": "uploads\\chapters\\file-1758981903485-776280882.pdf",
+        "originalName": "XML.pdf",
+        "fileSize": 722661,
+        "uploadedAt": "2025-09-27T14:05:03.538Z"
+      }
+    ],
+    "createdAt": "2025-09-27T14:05:03.539Z",
+    "updatedAt": "2025-10-05T15:27:14.227Z",
+    "isPublished": false
+  },
+  {
+    "id": "chapter_1759678426372_qyas90onb",
+    "title": "aaaaaaaa",
+    "description": "",
+    "lessonId": "lesson_1758895953440_xhww0efx6",
+    "order": 1,
+    "duration": "12",
+    "sections": [
+      {
+        "type": "pdf",
+        "content": "aaaaaaaa"
+      }
+    ],
+    "createdAt": "2025-10-05T15:33:46.375Z",
+    "updatedAt": "2025-10-05T15:34:52.854Z",
+    "isPublished": true
+  },
+  {
+    "id": "chapter_1759679519553_ikxkkcib3",
+    "title": "tessssttttt chapter",
+    "description": "",
+    "lessonId": "lesson_1758895978069_414zfrd1o",
+    "order": 1,
+    "duration": "1 hour",
+    "sections": [
+      {
+        "type": "video",
+        "content": "https://youtu.be/7zW-p2GRi90"
+      },
+      {
+        "type": "text",
+        "content": "UI (User Interface) et UX (User eXperience) sont deux disciplines du design numérique : l'UI concerne la partie visuelle et interactive d'un produit (boutons, écrans, menus), tandis que l'UX englobe l'expérience globale de l'utilisateur, c'est-à-dire tout son ressenti, ses besoins et l'efficacité de son interaction avec le produit. L'UI se concentre sur l'apparence, l'UX sur la fonctionnalité et l'émotion, ces deux aspects étant complémentaires pour créer un produit réussi. "
+      },
+      {
+        "type": "image",
+        "content": "295862284_117322884380315_5269318077403957829_n.jpg"
+      },
+      {
+        "type": "text",
+        "content": "L'UI design sert quant à lui à améliorer l'interaction d'un utilisateur avec un produit"
+      }
+    ],
+    "createdAt": "2025-10-05T15:51:59.555Z",
+    "updatedAt": "2025-10-05T15:51:59.554Z"
+  },
+  {
+    "id": "chapter_1759680594092_v6uy5d2w9",
+    "title": "test chapter",
+    "description": "",
+    "lessonId": "lesson_1759680448674_uo5a9415x",
+    "order": 1,
+    "duration": "1 hour",
+    "sections": [
+      {
+        "type": "text",
+        "content": "L'UI design sert quant à lui à améliorer l'interaction d'un utilisateur avec un produit"
+      },
+      {
+        "type": "image",
+        "content ": "https://www.google.com/url?sa=i&url=https%3A%2F%2Fusabilis.com%2Fbonne-agence-ux%2F&psig=AOvVaw16VUDWnc_niyKj7i8U1UKO&ust=1759766891160000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPjCoNe4jZADFQAAAAAdAAAAABAE"
+      },
+      {
+        "type": "text",
+        "content": "UI (User Interface) et UX (User eXperience) sont deux disciplines du design numérique : l'UI concerne la partie visuelle et interactive d'un produit (boutons, écrans, menus), tandis que l'UX englobe l'expérience globale de l'utilisateur, c'est-à-dire tout son ressenti, ses besoins et l'efficacité de son interaction avec le produit"
+      },
+      {
+        "type": "video",
+        "content": "https://youtu.be/olBqYH-CNIg"
+      }
+    ],
+    "createdAt": "2025-10-05T16:09:54.093Z",
+    "updatedAt": "2025-10-05T16:11:01.158Z",
+    "isPublished": true
+  },
+  {
+    "id": "chapter_1759680771385_wqzo6r8ti",
+    "title": "CV_Roua (1)",
+    "description": "",
+    "lessonId": "lesson_1759680448674_uo5a9415x",
+    "order": 0,
+    "duration": "0 min",
+    "sections": [
+      {
+        "id": "section_1759680771385_c1kilcpao",
+        "type": "pdf",
+        "content": "file-1759680771366-628822524.pdf",
+        "filePath": "uploads\\chapters\\file-1759680771366-628822524.pdf",
+        "originalName": "CV_Roua (1).pdf",
+        "fileSize": 64499,
+        "uploadedAt": "2025-10-05T16:12:51.385Z"
+      }
+    ],
+    "createdAt": "2025-10-05T16:12:51.386Z",
+    "updatedAt": "2025-10-05T16:12:54.403Z",
+    "isPublished": true
+  },
+  {
+    "id": "chapter_1759684222626_252ysskyf",
+    "title": "Résumé",
+    "description": "",
+    "lessonId": "lesson_1759680448674_uo5a9415x",
+    "order": 0,
+    "duration": "0 min",
+    "sections": [
+      {
+        "id": "section_1759684222626_nwec4g79e",
+        "type": "text",
+        "content": "file-1759684222595-28977719.docx",
+        "filePath": "uploads\\chapters\\file-1759684222595-28977719.docx",
+        "originalName": "RÃ©sumÃ©.docx",
+        "fileSize": 308585,
+        "uploadedAt": "2025-10-05T17:10:22.626Z"
+      }
+    ],
+    "createdAt": "2025-10-05T17:10:22.635Z",
+    "updatedAt": "2025-10-05T17:10:27.565Z",
+    "isPublished": true
+  },
+  {
+    "id": "chapter_1768924775636_3x7qzqb4e",
+    "title": "Devopss-1",
+    "description": "",
+    "lessonId": "lesson_1768924711556_x46ccfekb",
+    "order": 0,
+    "duration": "0 min",
+    "sections": [
+      {
+        "type": "pdf",
+        "content": "file-1768924775613-833788690.docx"
+      }
+    ],
+    "createdAt": "2026-01-20T15:59:35.636Z",
+    "updatedAt": "2026-01-20T16:26:24.521Z",
+    "isPublished": true
+  },
+  {
+    "id": "chapter_1768924846492_kqe5cczqj",
+    "title": "intro",
+    "description": "",
+    "lessonId": "lesson_1768924711556_x46ccfekb",
+    "order": 3,
+    "duration": "5",
+    "sections": [
+      {
+        "type": "video",
+        "content": "https://youtu.be/tah_pIqQYTY"
+      }
+    ],
+    "createdAt": "2026-01-20T16:00:46.492Z",
+    "updatedAt": "2026-01-20T16:26:25.620Z",
+    "isPublished": true
+  },
+  {
+    "id": "chapter_1768926562186_2zkwfijlo",
+    "title": "Examen_Ecrit_DevOps",
+    "description": "",
+    "lessonId": "lesson_1768924711556_x46ccfekb",
+    "order": 1,
+    "duration": "0 min",
+    "sections": [
+      {
+        "type": "pdf",
+        "content": "file-1768926562181-718995370.pdf"
+      }
+    ],
+    "createdAt": "2026-01-20T16:29:22.186Z",
+    "updatedAt": "2026-01-20T16:29:54.990Z",
+    "isPublished": true
+  },
+  {
+    "id": "chapter_1769003548776_uncqfv5il",
+    "title": "Scénarisation pour le Chapitre Spring Boot Maven",
+    "description": "",
+    "lessonId": "lesson_1768924711556_x46ccfekb",
+    "order": 1,
+    "duration": "0 min",
+    "sections": [
+      {
+        "type": "mixed",
+        "content": "{\"title\":\"Introduction\",\"parts\":[{\"type\":\"text\",\"content\":\"À la fin de ce chapitre, Vous serez capables de :  Comprendre les concepts de base de Spring Boot et Maven. Expliquer les avantages de l'utilisation de Spring Boot. Créer et configurer un projet Maven. Gérer les dépendances dans un projet Maven. Développer une application Spring Boot simple.\"},{\"type\":\"text\",\"content\":\"À la fin de ce chapitre, Vous serez capables de :  Comprendre les concepts de base de Spring Boot et Maven. Expliquer les avantages de l'utilisation de Spring Boot. Créer et configurer un projet Maven. Gérer les dépendances dans un projet Maven. Développer une application Spring Boot simple.\"},{\"type\":\"image\",\"content\":\"/uploads/chapters/file-1769003548756-573723539.png\"},{\"type\":\"text\",\"content\":\"À la fin de ce chapitre, Vous serez capables de :  Comprendre les concepts de base de Spring Boot et Maven. Expliquer les avantages de l'utilisation de Spring Boot. Créer et configurer un projet Maven. Gérer les dépendances dans un projet Maven. Développer une application Spring Boot simple.\"},{\"type\":\"pdf\",\"content\":\"/uploads/chapters/file-1769003548767-392729635.pdf\"}]}"
+      }
+    ],
+    "createdAt": "2026-01-21T13:52:28.777Z",
+    "updatedAt": "2026-01-21T13:52:35.305Z",
+    "isPublished": true
+  }
+]

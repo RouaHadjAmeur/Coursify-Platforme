@@ -1,0 +1,1195 @@
+<%- include('partials/head', { title: `Manage Lesson: ${lesson.title} - Coursify Admin` }) %>
+
+    <%- include('partials/sidebar') %>
+
+    <!-- Right column -->
+    <div class="flex-1 flex flex-col">
+      <%- include('partials/navbar', { 
+        title: `Manage Lesson: ${lesson.title}`,
+        backButton: { href: 'javascript:history.back()' },
+        actionButton: { 
+          text: '👁️ Preview Lesson', 
+          onclick: `previewLesson('${lesson.id}')` 
+        }
+      }) %>
+
+      <!-- Main Content -->
+      <main class="mx-auto w-full max-w-7xl p-4 md:p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Manage Lesson: <%= lesson.title %></h1>
+          <p class="text-gray-600">Add and manage chapters and quizzes for this lesson</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Chapters Section -->
+          <div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <h2 class="text-lg font-semibold text-gray-900">Chapters</h2>
+                    <p class="text-gray-600 text-sm mt-1">Manage the chapters in this lesson</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                  <button onclick="addChapter()" class="group bg-puce hover:bg-[#A86B7F] text-white px-3 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    <span class="hidden sm:inline">Add</span>
+                  </button>
+                    <button onclick="openImportChapter()" style="background-color:#B0D0D3;" 
+        onmouseover="this.style.backgroundColor='#9ABEC1'" 
+        onmouseout="this.style.backgroundColor='#B0D0D3'"
+        class="text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                      Import Chapter (PDF/TXT/DOC)
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div id="chaptersList" class="divide-y divide-gray-200">
+                <!-- Chapters will be loaded here -->
+                <div class="p-6 text-center">
+                  <div class="text-gray-400 mb-4">
+                    <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-medium text-gray-900 mb-2">No chapters yet</h3>
+                  <p class="text-gray-600 mb-4">Add chapters to break down this lesson into smaller parts.</p>
+                  <button onclick="addChapter()" class="bg-puce hover:bg-[#A86B7F] text-white px-4 py-2 rounded-lg transition-colors">
+                    Add First Chapter
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quizzes Section -->
+          <div>
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <h2 class="text-lg font-semibold text-gray-900">Quizzes</h2>
+                    <p class="text-gray-600 text-sm mt-1">Manage quizzes for this lesson</p>
+                  </div>
+                  <button onclick="addQuiz()" class="group bg-melon hover:bg-[#F59A8A] text-white px-3 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    <span class="hidden sm:inline">Add</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div id="quizzesList" class="divide-y divide-gray-200">
+                <!-- Quizzes will be loaded here -->
+                <div class="p-6 text-center">
+                  <div class="text-gray-400 mb-4">
+                    <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-medium text-gray-900 mb-2">No quizzes yet</h3>
+                  <p class="text-gray-600 mb-4">Add quizzes to test students' understanding.</p>
+                  <button onclick="addQuiz()" class="bg-melon hover:bg-[#F59A8A] text-white px-4 py-2 rounded-lg transition-colors">
+                    Add First Quiz
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Edit Chapter Modal -->
+  <div id="editChapterModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Edit Chapter</h3>
+        <button onclick="closeEditChapterModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <form id="editChapterForm" class="space-y-4">
+        <input type="hidden" id="editChapterId">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Chapter Title</label>
+          <input type="text" id="editChapterTitle" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Order</label>
+            <input type="number" id="editChapterOrder" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Duration</label>
+            <input type="text" id="editChapterDuration" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" onclick="closeEditChapterModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-puce hover:bg-[#A86B7F] text-white rounded-lg transition-colors">Update Chapter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Manage Chapter Content Modal -->
+  <div id="manageChapterModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Manage Chapter Content</h3>
+        <button onclick="closeManageChapterModal()" class="text-gray-400 hover:text-gray-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+      </div>
+      <form id="manageChapterForm" class="space-y-4">
+        <input type="hidden" id="manageChapterId">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Sections</label>
+          <div id="manageSectionsContainer" class="space-y-4"></div>
+          <button type="button" onclick="manageAddSection()" class="mt-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 text-sm">➕ Add Section</button>
+        </div>
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" onclick="closeManageChapterModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Add Chapter Modal -->
+  <div id="addChapterModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Add New Chapter</h3>
+        <button onclick="closeAddChapterModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form id="addChapterForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Chapter Title</label>
+          <input type="text" id="chapterTitle" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">First Section Type</label>
+          <select id="chapterFirstSectionType" onchange="handleChapterSectionTypeChange()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+            <option value="text">Text</option>
+            <option value="video">Video</option>
+            <option value="image">Image</option>
+            <option value="audio">Audio</option>
+            <option value="pdf">PDF</option>
+            <option value="docx">DOCX</option>
+            <option value="mixed">Mixed Content</option>
+          </select>
+        </div>
+
+        <!-- Standard content field (for text, video, image, audio, pdf, docx) -->
+        <div id="chapterStandardContentField" class="mt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">First Section Content</label>
+          <input type="text" id="chapterFirstSectionContent" placeholder="Text content, URL, etc." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+        </div>
+
+        <!-- Mixed content fields (shown when type is "mixed") -->
+        <div id="chapterMixedContentFields" class="hidden mt-4 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Section Title</label>
+            <input type="text" id="chapterMixedTitle" placeholder="Enter section title" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Content Parts</label>
+            <div id="chapterMixedPartsContainer" class="space-y-3">
+              <!-- Parts will be added here dynamically -->
+            </div>
+            <button type="button" onclick="addMixedContentPart()" class="mt-2 flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Add Part
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Order</label>
+            <input type="number" id="chapterOrder" min="1" value="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Duration</label>
+            <input type="text" id="chapterDuration" placeholder="e.g., 30 min" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          <input type="checkbox" id="chapterPublished" class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+          <label for="chapterPublished" class="ml-2 text-sm text-gray-700">Publish immediately</label>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" onclick="closeAddChapterModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 bg-puce hover:bg-[#A86B7F] text-white rounded-lg transition-colors">
+            Add Chapter
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Quiz Modal -->
+  <div id="addQuizModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Add New Quiz</h3>
+        <button onclick="closeAddQuizModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form id="addQuizForm" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Quiz Title</label>
+            <input type="text" id="quizTitle" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <input type="text" id="quizDescription" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Time Limit (minutes)</label>
+            <input type="number" id="quizTimeLimit" min="1" value="30" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Passing Score (%)</label>
+            <input type="number" id="quizPassingScore" min="1" max="100" value="70" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Questions</label>
+          <div id="questionsContainer" class="space-y-4">
+            <!-- Questions will be added here dynamically -->
+          </div>
+          <button type="button" onclick="addQuestion()" class="mt-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+            ➕ Add Question
+          </button>
+        </div>
+
+        <div class="flex items-center">
+          <input type="checkbox" id="quizPublished" class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+          <label for="quizPublished" class="ml-2 text-sm text-gray-700">Publish immediately</label>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" onclick="closeAddQuizModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 bg-melon hover:bg-[#F59A8A] text-white rounded-lg transition-colors">
+            Add Quiz
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let chapters = [];
+    let quizzes = [];
+    let questionCount = 0;
+
+    // Verify authentication
+    async function checkAuth() {
+      try {
+        const authRes = await fetch('/api/auth/status', { credentials: 'include' });
+        if (!authRes.ok) {
+          throw new Error('Auth check failed');
+        }
+        const authData = await authRes.json();
+        if (!authData.isAuthenticated) {
+          alert('You must be logged in to manage lessons. Redirecting to login...');
+          window.location.href = '/login';
+          return false;
+        }
+        const role = authData.user?.role?.toLowerCase();
+        if (role === 'student') {
+          alert('Students cannot manage lessons. Access denied.');
+          window.location.href = '/';
+          return false;
+        }
+        return true;
+      } catch (err) {
+        console.error('Error checking auth:', err);
+        alert('Authentication error. Please log in again.');
+        window.location.href = '/login';
+        return false;
+      }
+    }
+
+    // Load data on page load
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Verify authentication first
+      const isAuthenticated = await checkAuth();
+      if (!isAuthenticated) return;
+      
+      // Check for URL parameters to auto-open modals
+      const urlParams = new URLSearchParams(window.location.search);
+      const action = urlParams.get('action');
+      if (action === 'addChapter') {
+        setTimeout(() => addChapter(), 100); // Small delay to ensure page is fully loaded
+      } else if (action === 'addQuiz') {
+        setTimeout(() => addQuiz(), 100);
+      }
+      loadChapters();
+      loadQuizzes();
+    });
+
+    async function loadChapters() {
+      try {
+        const response = await fetch(`/api/chapters/lesson/<%= lesson.id %>`, {
+          credentials: 'include'
+        });
+        chapters = await response.json();
+        renderChapters();
+      } catch (error) {
+        console.error('Error loading chapters:', error);
+      }
+    }
+
+    async function loadQuizzes() {
+      try {
+        const response = await fetch(`/api/quizzes/lesson/<%= lesson.id %>`);
+        quizzes = await response.json();
+        renderQuizzes();
+      } catch (error) {
+        console.error('Error loading quizzes:', error);
+      }
+    }
+
+    function renderChapters() {
+      const container = document.getElementById('chaptersList');
+      
+      if (chapters.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center">
+            <div class="text-gray-400 mb-4">
+              <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No chapters yet</h3>
+            <p class="text-gray-600 mb-4">Add chapters to break down this lesson into smaller parts.</p>
+            <button onclick="addChapter()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+              Add First Chapter
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = chapters.map((chapter, index) => `
+        <div class="p-6 hover:bg-gray-50 transition-colors">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <span class="text-sm font-medium text-green-600">${index + 1}</span>
+                </div>
+                <div>
+                  <h3 class="text-lg font-medium text-gray-900">${chapter.title}</h3>
+                  <p class="text-gray-600 text-sm">Sections: ${Array.isArray(chapter.sections) ? chapter.sections.length : 0}</p>
+                </div>
+              </div>
+              <div class="ml-11 flex items-center gap-4 text-sm text-gray-500">
+                <span>⏱️ ${chapter.duration || 'No duration'}</span>
+                <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${chapter.isPublished ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                  ${chapter.isPublished ? 'Published' : 'Draft'}
+                </span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 ml-4">
+              <button title="Edit" onclick="editChapter('${chapter.id}')" class="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
+              <button title="Manage content" onclick="manageChapterContent('${chapter.id}')" class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3-1.343 3-3S13.657 2 12 2 9 3.343 9 5s1.343 3 3 3zm0 2c-2.21 0-4 1.79-4 4v6h8v-6c0-2.21-1.79-4-4-4z"/></svg></button>
+              <button title="Toggle" onclick="toggleChapter('${chapter.id}', ${chapter.isPublished})" class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg></button>
+              <button title="Delete" onclick="deleteChapter('${chapter.id}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderQuizzes() {
+      const container = document.getElementById('quizzesList');
+      
+      if (quizzes.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center">
+            <div class="text-gray-400 mb-4">
+              <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No quizzes yet</h3>
+            <p class="text-gray-600 mb-4">Add quizzes to test students' understanding.</p>
+            <button onclick="addQuiz()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+              Add First Quiz
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = quizzes.map((quiz, index) => `
+        <div class="p-6 hover:bg-gray-50 transition-colors">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                  <span class="text-sm font-medium text-purple-600">${index + 1}</span>
+                </div>
+                <div>
+                  <h3 class="text-lg font-medium text-gray-900">${quiz.title}</h3>
+                  <p class="text-gray-600 text-sm">${quiz.description || 'No description'}</p>
+                </div>
+              </div>
+              <div class="ml-11 flex items-center gap-4 text-sm text-gray-500">
+                <span>⏱️ ${quiz.timeLimit} min</span>
+                <span>🎯 ${quiz.passingScore}% pass</span>
+                <span>❓ ${quiz.questions ? quiz.questions.length : 0} questions</span>
+                <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${quiz.isPublished ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                  ${quiz.isPublished ? 'Published' : 'Draft'}
+                </span>
+
+                <button title="Toggle"  onclick="toggleQuiz('${quiz.id}', ${quiz.isPublished})" class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg></button>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 ml-4">
+              <button title="Edit" onclick="editQuiz('${quiz.id}')" class="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
+              <button title="Preview" onclick="previewQuiz('${quiz.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button>
+              <button title="Delete" onclick="deleteQuiz('${quiz.id}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Chapter functions
+    function addChapter() {
+      document.getElementById('addChapterModal').classList.remove('hidden');
+    }
+
+    function closeAddChapterModal() {
+      document.getElementById('addChapterModal').classList.add('hidden');
+      document.getElementById('addChapterForm').reset();
+      // Reset mixed content fields visibility
+      document.getElementById('chapterStandardContentField').classList.remove('hidden');
+      document.getElementById('chapterMixedContentFields').classList.add('hidden');
+      // Clear mixed content parts
+      document.getElementById('chapterMixedPartsContainer').innerHTML = '';
+    }
+
+    // Handle section type change
+    window.handleChapterSectionTypeChange = function() {
+      const type = document.getElementById('chapterFirstSectionType').value;
+      const standardField = document.getElementById('chapterStandardContentField');
+      const mixedFields = document.getElementById('chapterMixedContentFields');
+      
+      if (type === 'mixed') {
+        standardField.classList.add('hidden');
+        mixedFields.classList.remove('hidden');
+        // Add first part if container is empty
+        const container = document.getElementById('chapterMixedPartsContainer');
+        if (container.children.length === 0) {
+          addMixedContentPart();
+        }
+      } else {
+        standardField.classList.remove('hidden');
+        mixedFields.classList.add('hidden');
+      }
+    };
+
+    // Add a new part to mixed content
+    window.addMixedContentPart = function() {
+      const container = document.getElementById('chapterMixedPartsContainer');
+      const partIndex = container.children.length;
+      const partDiv = document.createElement('div');
+      partDiv.className = 'border border-gray-300 rounded-lg p-4 bg-gray-50';
+      partDiv.setAttribute('data-part-index', partIndex);
+      partDiv.innerHTML = `
+        <div class="flex items-center justify-between mb-3">
+          <label class="text-sm font-medium text-gray-700">Part ${partIndex + 1}</label>
+          <button type="button" onclick="removeMixedContentPart(this)" class="text-red-600 hover:text-red-800 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+            <select data-part-type class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" onchange="handleMixedPartTypeChange(this)">
+              <option value="text">Text</option>
+              <option value="video">Video</option>
+              <option value="image">Image</option>
+              <option value="audio">Audio</option>
+              <option value="pdf">PDF</option>
+              <option value="docx">DOCX</option>
+            </select>
+          </div>
+          <div data-part-content-field>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+            <input data-part-content type="text" placeholder="Text content, URL, etc." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+        </div>
+      `;
+      container.appendChild(partDiv);
+    };
+
+    // Remove a part from mixed content
+    window.removeMixedContentPart = function(button) {
+      if (confirm('Are you sure you want to remove this part?')) {
+        button.closest('div.border').remove();
+        // Renumber parts
+        const container = document.getElementById('chapterMixedPartsContainer');
+        Array.from(container.children).forEach((part, index) => {
+          part.querySelector('label').textContent = `Part ${index + 1}`;
+        });
+      }
+    };
+
+    // Handle part type change
+    window.handleMixedPartTypeChange = function(select) {
+      const partDiv = select.closest('div.border');
+      const contentField = partDiv.querySelector('[data-part-content-field]');
+      const type = select.value;
+      
+      // Update content field based on type
+      if (type === 'text') {
+        contentField.innerHTML = `
+          <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+          <textarea data-part-content rows="3" placeholder="Enter text content" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"></textarea>
+        `;
+      } else if (type === 'image') {
+        contentField.innerHTML = `
+          <label class="block text-sm font-medium text-gray-700 mb-1">Image</label>
+          <input data-part-content type="text" placeholder="Image URL" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 mb-2">
+          <input data-part-file type="file" accept="image/*" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+        `;
+      } else if (type === 'video' || type === 'audio') {
+        contentField.innerHTML = `
+          <label class="block text-sm font-medium text-gray-700 mb-1">URL</label>
+          <input data-part-content type="text" placeholder="Video/Audio URL" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+        `;
+      } else if (type === 'pdf' || type === 'docx') {
+        contentField.innerHTML = `
+          <label class="block text-sm font-medium text-gray-700 mb-1">File</label>
+          <input data-part-file type="file" accept="${type === 'pdf' ? '.pdf' : '.doc,.docx'}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+        `;
+      } else {
+        contentField.innerHTML = `
+          <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+          <input data-part-content type="text" placeholder="Content or URL" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+        `;
+      }
+    };
+
+    document.getElementById('addChapterForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const sectionType = document.getElementById('chapterFirstSectionType').value;
+      let sectionContent = '';
+      
+      // Handle mixed content differently
+      if (sectionType === 'mixed') {
+        const title = document.getElementById('chapterMixedTitle').value || '';
+        const partsContainer = document.getElementById('chapterMixedPartsContainer');
+        const parts = [];
+        
+        // Process each part
+        for (const partDiv of partsContainer.children) {
+          const type = partDiv.querySelector('[data-part-type]').value;
+          const contentInput = partDiv.querySelector('[data-part-content]');
+          const fileInput = partDiv.querySelector('[data-part-file]');
+          
+          let partContent = '';
+          
+          if (fileInput && fileInput.files.length > 0) {
+            // Upload file
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('lessonId', '<%= lesson.id %>');
+            try {
+              const uploadRes = await fetch('/api/chapters/upload', {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+              });
+              if (uploadRes.ok) {
+                const uploadData = await uploadRes.json();
+                partContent = uploadData.fileUrl || uploadData.url || '';
+              } else {
+                const errorData = await uploadRes.json().catch(() => ({ message: 'Upload failed' }));
+                if (uploadRes.status === 401) {
+                  alert('Authentication failed. Please log in again.');
+                  window.location.href = '/login';
+                  throw new Error('Authentication failed');
+                } else {
+                  console.error('Upload error:', errorData);
+                  alert('Error uploading file: ' + (errorData.message || 'Unknown error'));
+                }
+              }
+            } catch (err) {
+              console.error('Error uploading file:', err);
+              if (err.message === 'Authentication failed') {
+                throw err; // Re-throw to stop processing
+              }
+            }
+          } else if (contentInput) {
+            partContent = contentInput.value || '';
+          }
+          
+          if (type && partContent) {
+            parts.push({ type, content: partContent });
+          }
+        }
+        
+        const mixedData = {
+          title: title,
+          parts: parts
+        };
+        
+        sectionContent = JSON.stringify(mixedData);
+      } else {
+        sectionContent = document.getElementById('chapterFirstSectionContent').value || '';
+      }
+      
+      const chapterData = {
+        title: document.getElementById('chapterTitle').value,
+        lessonId: '<%= lesson.id %>',
+        order: parseInt(document.getElementById('chapterOrder').value),
+        duration: document.getElementById('chapterDuration').value,
+        isPublished: document.getElementById('chapterPublished').checked,
+        sections: [
+          {
+            type: sectionType,
+            content: sectionContent
+          }
+        ]
+      };
+
+      try {
+        const response = await fetch('/api/chapters', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(chapterData)
+        });
+
+        if (response.ok) {
+          closeAddChapterModal();
+          loadChapters();
+          alert('Chapter added successfully!');
+        } else {
+          const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
+          if (response.status === 401) {
+            alert('Authentication failed. Please log in again.');
+            window.location.href = '/login';
+          } else {
+            alert('Error adding chapter: ' + (errorData.message || 'Unknown error'));
+          }
+        }
+      } catch (error) {
+        console.error('Error adding chapter:', error);
+        alert('Error adding chapter');
+      }
+    });
+
+    // Import Chapter
+    function openImportChapter() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.pdf,.txt,.doc,.docx';
+      input.onchange = async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('lessonId', '<%= lesson.id %>');
+        formData.append('title', file.name.replace(/\.[^.]+$/, ''));
+        try {
+          const response = await fetch('/api/chapters/import', {
+            method: 'POST',
+            credentials: 'include',
+            body: formData
+          });
+          if (response.ok) {
+            loadChapters();
+            alert('Chapter imported successfully!');
+          } else {
+            alert('Error importing chapter');
+          }
+        } catch (error) {
+          console.error('Error importing chapter:', error);
+          alert('Error importing chapter');
+        }
+      };
+      input.click();
+    }
+
+    async function exportChapter(chapterId) {
+      const type = prompt('Filter by section type (optional: text, video, image, audio, pdf). Leave empty for all.');
+      const url = type ? `/api/chapters/${chapterId}/export?format=json&sectionType=${encodeURIComponent(type)}` : `/api/chapters/${chapterId}/export?format=json`;
+      window.open(url, '_blank');
+    }
+
+    // Quiz functions
+    function addQuiz() {
+      document.getElementById('addQuizModal').classList.remove('hidden');
+      addQuestion(); // Add first question by default
+    }
+
+    function closeAddQuizModal() {
+      document.getElementById('addQuizModal').classList.add('hidden');
+      document.getElementById('addQuizForm').reset();
+      document.getElementById('questionsContainer').innerHTML = '';
+      questionCount = 0;
+    }
+
+    function addQuestion() {
+      questionCount++;
+      const container = document.getElementById('questionsContainer');
+      const questionDiv = document.createElement('div');
+      questionDiv.className = 'border border-gray-200 rounded-lg p-4';
+      questionDiv.innerHTML = `
+        <div class="flex justify-between items-center mb-3">
+          <h4 class="font-medium text-gray-900">Question ${questionCount}</h4>
+          <button type="button" onclick="removeQuestion(this)" class="text-red-600 hover:text-red-800">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Question Text</label>
+            <input type="text" name="questionText" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Options (one per line)</label>
+            <textarea name="questionOptions" rows="4" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="Option A&#10;Option B&#10;Option C&#10;Option D"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Correct Answer(s) (comma-separated indices, e.g., 0,2)</label>
+            <input type="text" name="questionCorrectAnswers" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500" placeholder="0,2">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Explanation (Optional)</label>
+            <input type="text" name="questionExplanation" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+          </div>
+        </div>
+      `;
+      container.appendChild(questionDiv);
+    }
+
+    function removeQuestion(button) {
+      button.closest('.border').remove();
+    }
+
+    document.getElementById('addQuizForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      // Collect questions
+      const questions = [];
+      const questionElements = document.querySelectorAll('#questionsContainer > div');
+      
+      questionElements.forEach((element, index) => {
+        const text = element.querySelector('input[name="questionText"]').value;
+        const optionsText = element.querySelector('textarea[name="questionOptions"]').value;
+        const correctAnswersText = element.querySelector('input[name="questionCorrectAnswers"]').value;
+        const explanation = element.querySelector('input[name="questionExplanation"]').value;
+        
+        const options = optionsText.split('\n').filter(opt => opt.trim());
+        const correctAnswers = correctAnswersText.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+        
+        questions.push({
+          question: text,
+          options: options,
+          correctAnswers: correctAnswers,
+          explanation: explanation
+        });
+      });
+
+      const quizData = {
+        title: document.getElementById('quizTitle').value,
+        description: document.getElementById('quizDescription').value,
+        lessonId: '<%= lesson.id %>',
+        timeLimit: parseInt(document.getElementById('quizTimeLimit').value),
+        passingScore: parseInt(document.getElementById('quizPassingScore').value),
+        questions: questions,
+        isPublished: document.getElementById('quizPublished').checked
+      };
+
+      try {
+        const response = await fetch('/api/quizzes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(quizData)
+        });
+
+        if (response.ok) {
+          closeAddQuizModal();
+          loadQuizzes();
+          alert('Quiz added successfully!');
+        } else {
+          alert('Error adding quiz');
+        }
+      } catch (error) {
+        console.error('Error adding quiz:', error);
+        alert('Error adding quiz');
+      }
+    });
+
+    // Other functions
+    async function editChapter(chapterId) {
+      const chapter = chapters.find(c => c.id === chapterId);
+      if (!chapter) return;
+      document.getElementById('editChapterId').value = chapterId;
+      document.getElementById('editChapterTitle').value = chapter.title || '';
+      document.getElementById('editChapterOrder').value = chapter.order || 1;
+      document.getElementById('editChapterDuration').value = chapter.duration || '';
+      document.getElementById('editChapterModal').classList.remove('hidden');
+    }
+
+    function closeEditChapterModal(){ document.getElementById('editChapterModal').classList.add('hidden'); }
+
+    document.getElementById('editChapterForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const chapterId = document.getElementById('editChapterId').value;
+      const payload = {
+        title: document.getElementById('editChapterTitle').value,
+        order: parseInt(document.getElementById('editChapterOrder').value) || 1,
+        duration: document.getElementById('editChapterDuration').value
+      };
+      try {
+        const resp = await fetch(`/api/chapters/${chapterId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+        if (resp.ok) {
+          closeEditChapterModal();
+          loadChapters();
+          alert('Chapter updated successfully');
+        } else {
+          alert('Error updating chapter');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Error updating chapter');
+      }
+    });
+
+    function deleteChapter(chapterId) {
+      if (!confirm('Are you sure you want to delete this chapter?')) return;
+
+      fetch(`/api/chapters/${chapterId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      }).then(response => {
+        if (response.ok) {
+          loadChapters();
+          alert('Chapter deleted successfully!');
+        } else {
+          alert('Error deleting chapter');
+        }
+      }).catch(error => {
+        console.error('Error deleting chapter:', error);
+        alert('Error deleting chapter');
+      });
+    }
+
+    async function toggleChapter(chapterId, isPublished) {
+      try {
+        const resp = await fetch(`/api/chapters/${chapterId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ isPublished: !isPublished })
+        });
+        if (resp.ok) {
+          loadChapters();
+        } else {
+          alert('Error toggling chapter');
+        }
+      } catch (e) {
+        console.error('Error toggling chapter', e);
+        alert('Error toggling chapter');
+      }
+    }
+
+    async function editQuiz(quizId) {
+      const title = prompt('New quiz title (leave blank to keep)');
+      const timeLimit = prompt('Time limit (minutes, blank to keep)');
+      const passingScore = prompt('Passing score %, blank to keep');
+      const payload = {};
+      if (title) payload.title = title;
+      if (timeLimit) payload.timeLimit = parseInt(timeLimit);
+      if (passingScore) payload.passingScore = parseInt(passingScore);
+      if (!Object.keys(payload).length) return;
+      try {
+        const resp = await fetch(`/api/quizzes/${quizId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+        if (resp.ok) {
+          loadQuizzes();
+          alert('Quiz updated');
+        } else {
+          alert('Failed to update quiz');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Failed to update quiz');
+      }
+    }
+
+    // ----- Manage Chapter Content (sections) -----
+    function manageChapterContent(chapterId){
+      const chapter = chapters.find(c => c.id === chapterId);
+      if (!chapter) return;
+      document.getElementById('manageChapterId').value = chapterId;
+      const container = document.getElementById('manageSectionsContainer');
+      container.innerHTML = '';
+      (chapter.sections || []).forEach(sec => container.appendChild(buildSectionRow(sec.type, sec.content, sec.id)));
+      document.getElementById('manageChapterModal').classList.remove('hidden');
+    }
+
+    function closeManageChapterModal(){ document.getElementById('manageChapterModal').classList.add('hidden'); }
+
+    function buildSectionRow(type = 'text', content = '', id){
+      const row = document.createElement('div');
+      row.className = 'border border-gray-200 rounded-lg p-4';
+      
+      // Parse mixed content if type is mixed
+      let mixedData = null;
+      if (type === 'mixed') {
+        try {
+          mixedData = typeof content === 'string' ? JSON.parse(content) : content;
+        } catch (e) {
+          mixedData = { title: '', parts: [] };
+        }
+      }
+      
+      const isMixed = type === 'mixed';
+      const contentValue = isMixed ? '' : (content || '').toString().replace(/"/g, '&quot;');
+      
+      row.innerHTML = `
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-4 items-start">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+              <select data-s="type" class="w-full border rounded p-2" onchange="handleSectionTypeChange(this)">
+                <option ${type==='text'?'selected':''} value="text">Text</option>
+                <option ${type==='video'?'selected':''} value="video">Video</option>
+                <option ${type==='image'?'selected':''} value="image">Image</option>
+                <option ${type==='audio'?'selected':''} value="audio">Audio</option>
+                <option ${type==='pdf'?'selected':''} value="pdf">PDF</option>
+                <option ${type==='docx'?'selected':''} value="docx">DOCX</option>
+                <option ${type==='mixed'?'selected':''} value="mixed">Mixed Content</option>
+              </select>
+            </div>
+            ${!isMixed ? `
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+              <input data-s="content" type="text" class="w-full border rounded p-2" value="${contentValue}" placeholder="Text/URL or filename" />
+            </div>
+            ` : ''}
+          </div>
+          ${isMixed ? `
+          <div data-mixed-fields class="space-y-3 border-t pt-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
+              <input data-s="mixed-title" type="text" class="w-full border rounded p-2" value="${(mixedData?.title || '').replace(/"/g, '&quot;')}" placeholder="Enter section title" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Content Parts</label>
+              <div data-mixed-parts class="space-y-3">
+                ${(mixedData?.parts || []).map((part, idx) => `
+                  <div class="border border-gray-300 rounded p-3 bg-gray-50" data-part-index="${idx}">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-sm font-medium">Part ${idx + 1}</span>
+                      <button type="button" onclick="removeManageMixedPart(this)" class="text-red-600 text-sm">×</button>
+                    </div>
+                    <div class="space-y-2">
+                      <select data-part-type class="w-full border rounded p-1 text-sm">
+                        <option ${part.type==='text'?'selected':''} value="text">Text</option>
+                        <option ${part.type==='video'?'selected':''} value="video">Video</option>
+                        <option ${part.type==='image'?'selected':''} value="image">Image</option>
+                        <option ${part.type==='audio'?'selected':''} value="audio">Audio</option>
+                        <option ${part.type==='pdf'?'selected':''} value="pdf">PDF</option>
+                        <option ${part.type==='docx'?'selected':''} value="docx">DOCX</option>
+                      </select>
+                      <input data-part-content type="text" class="w-full border rounded p-1 text-sm" value="${(part.content || '').replace(/"/g, '&quot;')}" placeholder="Content or URL" />
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+              <button type="button" onclick="addManageMixedPart(this)" class="mt-2 text-sm text-green-600 hover:text-green-800">+ Add Part</button>
+            </div>
+          </div>
+          ` : ''}
+          <div class="flex justify-end mt-2">
+            <button type="button" class="text-red-600 text-sm" onclick="this.closest('div.border').remove()">Remove</button>
+          </div>
+        </div>`;
+      return row;
+    }
+    
+    // Handle section type change in manage sections
+    window.handleSectionTypeChange = function(select) {
+      const row = select.closest('div.border');
+      const mixedFields = row.querySelector('[data-mixed-fields]');
+      const contentField = row.querySelector('[data-s="content"]')?.closest('div');
+      
+      if (select.value === 'mixed') {
+        if (!mixedFields) {
+          // Create mixed fields if they don't exist
+          const fieldsDiv = document.createElement('div');
+          fieldsDiv.setAttribute('data-mixed-fields', '');
+          fieldsDiv.className = 'space-y-3 border-t pt-3 mt-3';
+          fieldsDiv.innerHTML = `
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Section Title</label>
+              <input data-s="mixed-title" type="text" class="w-full border rounded p-2" placeholder="Enter section title" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Content Parts</label>
+              <div data-mixed-parts class="space-y-3"></div>
+              <button type="button" onclick="addManageMixedPart(this)" class="mt-2 text-sm text-green-600 hover:text-green-800">+ Add Part</button>
+            </div>
+          `;
+          // Add first part
+          addManageMixedPart(fieldsDiv.querySelector('button'));
+          select.closest('div.grid').parentElement.insertBefore(fieldsDiv, select.closest('div.grid').nextSibling);
+        }
+        if (contentField) contentField.style.display = 'none';
+        if (mixedFields) mixedFields.style.display = 'block';
+      } else {
+        if (contentField) contentField.style.display = 'block';
+        if (mixedFields) mixedFields.style.display = 'none';
+      }
+    };
+
+    function manageAddSection(){
+      const c = document.getElementById('manageSectionsContainer');
+      c.appendChild(buildSectionRow('text',''));
+    }
+
+    document.getElementById('manageChapterForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const chapterId = document.getElementById('manageChapterId').value;
+      const container = document.getElementById('manageSectionsContainer');
+      const sections = Array.from(container.querySelectorAll('div.border')).map(div => {
+        const type = div.querySelector('[data-s="type"]').value;
+        let content = '';
+        
+        if (type === 'mixed') {
+          // Build mixed content object with parts
+          const title = div.querySelector('[data-s="mixed-title"]')?.value || '';
+          const partsContainer = div.querySelector('[data-mixed-parts]');
+          const parts = [];
+          
+          if (partsContainer) {
+            Array.from(partsContainer.children).forEach(partDiv => {
+              const partType = partDiv.querySelector('[data-part-type]')?.value;
+              const partContent = partDiv.querySelector('[data-part-content]')?.value || '';
+              if (partType && partContent) {
+                parts.push({ type: partType, content: partContent });
+              }
+            });
+          }
+          
+          const mixedData = {
+            title: title,
+            parts: parts
+          };
+          content = JSON.stringify(mixedData);
+        } else {
+          content = div.querySelector('[data-s="content"]')?.value || '';
+        }
+        
+        return { type, content };
+      });
+      try{
+        const resp = await fetch(`/api/chapters/${chapterId}`, {
+          method:'PUT', headers:{'Content-Type':'application/json'}, credentials:'include',
+          body: JSON.stringify({ sections })
+        });
+        if (resp.ok){ closeManageChapterModal(); loadChapters(); alert('Content updated'); }
+        else alert('Error updating content');
+      }catch(err){ console.error(err); alert('Error updating content'); }
+    });
+    async function toggleQuiz(quizId, isPublished) {
+      try {
+        const resp = await fetch(`/api/quizzes/${quizId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ isPublished: !isPublished })
+        });
+        if (resp.ok) {
+          loadQuizzes();
+        } else {
+          alert('Failed to toggle quiz');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Failed to toggle quiz');
+      }
+    }
+
+    function previewQuiz(quizId) {
+      window.location.href = `/test-quiz/${quizId}`;
+    }
+
+    function deleteQuiz(quizId) {
+      if (!confirm('Are you sure you want to delete this quiz?')) return;
+
+      fetch(`/api/quizzes/${quizId}`, {
+        method: 'DELETE'
+      }).then(response => {
+        if (response.ok) {
+          loadQuizzes();
+          alert('Quiz deleted successfully!');
+        } else {
+          alert('Error deleting quiz');
+        }
+      }).catch(error => {
+        console.error('Error deleting quiz:', error);
+        alert('Error deleting quiz');
+      });
+    }
+
+    function previewLesson(lessonId) {
+      alert('Preview lesson functionality coming soon!');
+    }
+  </script>
+
+<%- include('partials/footer') %>

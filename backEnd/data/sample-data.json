@@ -1,0 +1,159 @@
+{
+  "courses": [
+    {
+      "id": "course_sample_1",
+      "title": "Complete Web Development Course",
+      "description": "Learn full-stack web development from scratch",
+      "level": "Beginner",
+      "image": "https://picsum.photos/seed/webdev/600/400",
+      "hours": "40-50 hrs",
+      "learners": 0,
+      "certificate": true,
+      "price": 99,
+      "category": "Programming",
+      "instructor": "John Doe",
+      "createdAt": "2024-01-15T10:00:00Z",
+      "status": "published",
+      "skills": ["HTML", "CSS", "JavaScript", "React", "Node.js"],
+      "participatedUsers": [],
+      "progress": 0,
+      "lessons": []
+    }
+  ],
+  "lessons": [
+    {
+      "id": "lesson_1",
+      "title": "Introduction to HTML",
+      "description": "Learn the basics of HTML structure and elements",
+      "courseId": "course_sample_1",
+      "order": 1,
+      "duration": "2 hours",
+      "videoUrl": "https://example.com/video1",
+      "content": "HTML is the foundation of web development...",
+      "isPublished": true,
+      "chapters": [],
+      "quizzes": [],
+      "createdAt": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": "lesson_2",
+      "title": "CSS Styling Fundamentals",
+      "description": "Master CSS for beautiful web designs",
+      "courseId": "course_sample_1",
+      "order": 2,
+      "duration": "3 hours",
+      "videoUrl": "https://example.com/video2",
+      "content": "CSS allows you to style your HTML elements...",
+      "isPublished": true,
+      "chapters": [],
+      "quizzes": [],
+      "createdAt": "2024-01-15T11:00:00Z"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "chapter_1",
+      "title": "HTML Document Structure",
+      "content": "Every HTML document has a basic structure with DOCTYPE, html, head, and body elements...",
+      "lessonId": "lesson_1",
+      "order": 1,
+      "duration": "30 min",
+      "videoUrl": "https://example.com/chapter1",
+      "isPublished": true,
+      "createdAt": "2024-01-15T10:45:00Z"
+    },
+    {
+      "id": "chapter_2",
+      "title": "HTML Elements and Tags",
+      "content": "Learn about different HTML elements like headings, paragraphs, links, and images...",
+      "lessonId": "lesson_1",
+      "order": 2,
+      "duration": "45 min",
+      "videoUrl": "https://example.com/chapter2",
+      "isPublished": true,
+      "createdAt": "2024-01-15T11:15:00Z"
+    },
+    {
+      "id": "chapter_3",
+      "title": "CSS Selectors",
+      "content": "Understanding CSS selectors and how to target specific elements...",
+      "lessonId": "lesson_2",
+      "order": 1,
+      "duration": "1 hour",
+      "videoUrl": "https://example.com/chapter3",
+      "isPublished": true,
+      "createdAt": "2024-01-15T11:30:00Z"
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "quiz_1",
+      "title": "HTML Basics Quiz",
+      "description": "Test your knowledge of HTML fundamentals",
+      "lessonId": "lesson_1",
+      "timeLimit": 15,
+      "passingScore": 70,
+      "questions": [
+        {
+          "question": "What does HTML stand for?",
+          "options": [
+            "HyperText Markup Language",
+            "High Tech Modern Language",
+            "Home Tool Markup Language",
+            "Hyperlink and Text Markup Language"
+          ],
+          "correctAnswers": [0],
+          "explanation": "HTML stands for HyperText Markup Language, which is the standard markup language for creating web pages."
+        },
+        {
+          "question": "Which HTML element is used for the largest heading?",
+          "options": ["h1", "h6", "heading", "head"],
+          "correctAnswers": [0],
+          "explanation": "The h1 element represents the most important heading on the page."
+        },
+        {
+          "question": "What is the correct HTML for creating a hyperlink?",
+          "options": [
+            "<a href='url'>Link</a>",
+            "<link>url</link>",
+            "<a>url</a>",
+            "<url>Link</url>"
+          ],
+          "correctAnswers": [0],
+          "explanation": "The correct syntax for a hyperlink is <a href='url'>Link</a>."
+        }
+      ],
+      "isPublished": true,
+      "createdAt": "2024-01-15T12:00:00Z"
+    },
+    {
+      "id": "quiz_2",
+      "title": "CSS Fundamentals Quiz",
+      "description": "Test your CSS knowledge",
+      "lessonId": "lesson_2",
+      "timeLimit": 20,
+      "passingScore": 75,
+      "questions": [
+        {
+          "question": "What does CSS stand for?",
+          "options": [
+            "Cascading Style Sheets",
+            "Computer Style Sheets",
+            "Creative Style Sheets",
+            "Colorful Style Sheets"
+          ],
+          "correctAnswers": [0],
+          "explanation": "CSS stands for Cascading Style Sheets, used for styling HTML elements."
+        },
+        {
+          "question": "Which CSS property is used to change the text color?",
+          "options": ["color", "text-color", "font-color", "text"],
+          "correctAnswers": [0],
+          "explanation": "The 'color' property is used to set the color of text in CSS."
+        }
+      ],
+      "isPublished": true,
+      "createdAt": "2024-01-15T12:30:00Z"
+    }
+  ]
+}

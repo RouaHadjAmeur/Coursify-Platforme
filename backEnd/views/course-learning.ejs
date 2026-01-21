@@ -1,0 +1,211 @@
+<%- include('partials/head', { title: `${course.title} - Course Learning` }) %>
+
+<!-- Sidebar -->
+<%- include('partials/sidebar') %>
+
+<!-- Main Content -->
+<div class="flex-1 flex flex-col">
+  <!-- Topbar -->
+  <%- include('partials/navbar', { 
+    title: course.title, 
+    backButton: { href: 'http://localhost:5173/all-courses' },
+    actionButton: { text: '📊 Progress', onclick: 'showProgress()' }
+  }) %>
+
+  <!-- Course Content -->
+  <main class="flex-1 p-6 bg-gray-50">
+    <div class="max-w-6xl mx-auto">
+      <!-- Course Header -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= course.title %></h1>
+            <p class="text-gray-600 mb-4"><%= course.description %></p>
+            
+            <div class="flex items-center gap-4 text-sm text-gray-500">
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <%= course.hours || '2-3 hrs' %>
+              </span>
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <%= course.learners || 0 %> learners
+              </span>
+              <span class="flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <%= course.certificate ? 'Certificate Available' : 'No Certificate' %>
+              </span>
+            </div>
+          </div>
+          
+          <div class="ml-6">
+            <div class="text-right">
+              <div class="text-2xl font-bold text-gray-900">
+                <%= course.price === 0 ? 'Free' : `$${course.price}` %>
+              </div>
+              <div class="text-sm text-gray-500">Course Price</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Progress -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Course Progress</h2>
+        <div class="flex items-center gap-4">
+          <div class="flex-1">
+            <div class="w-full bg-gray-200 rounded-full h-3">
+              <div id="progressBar" class="bg-blue-600 h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+          <span id="progressText" class="text-sm font-medium text-gray-600">0% Complete</span>
+        </div>
+      </div>
+
+      <!-- Lessons List -->
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-6 border-b border-gray-200">
+          <h2 class="text-xl font-semibold text-gray-900">Course Content</h2>
+          <p class="text-gray-600 mt-1"><%= lessons.length %> lessons available</p>
+        </div>
+        
+        <div class="divide-y divide-gray-200">
+          <% if (lessons && lessons.length > 0) { %>
+            <% lessons.forEach((lesson, index) => { %>
+              <div class="p-6 hover:bg-gray-50 transition-colors">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-4">
+                    <div class="flex-shrink-0">
+                      <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span class="text-sm font-medium text-blue-600"><%= index + 1 %></span>
+                      </div>
+                    </div>
+                    <div class="flex-1">
+                      <h3 class="text-lg font-medium text-gray-900"><%= lesson.title %></h3>
+                      <p class="text-gray-600 mt-1"><%= lesson.description %></p>
+                      <div class="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                        <span><%= lesson.duration || '30 min' %></span>
+                        <span><%= lesson.chapters?.length || 0 %> chapters</span>
+                        <span><%= lesson.quizzes?.length || 0 %> quizzes</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="flex items-center gap-2">
+                    <button 
+                      onclick="startLesson('<%= lesson.id %>')"
+                      class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                    >
+                      Start Lesson
+                    </button>
+                  </div>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="p-8 text-center text-gray-500">
+              <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <p class="text-lg font-medium">No lessons available yet</p>
+              <p class="text-sm">Lessons will appear here once they are added to this course.</p>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<%- include('partials/footer') %>
+
+<script>
+  // Course progress tracking
+  let currentProgress = 0;
+  const courseId = '<%= course.id %>';
+  const userId = localStorage.getItem('userId') || 'demo-user';
+
+  // Load user progress
+  async function loadProgress() {
+    try {
+      const response = await fetch(`/api/courses/${courseId}/progress/${userId}`, {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        currentProgress = data.progress || 0;
+        updateProgressDisplay();
+      }
+    } catch (error) {
+      console.error('Error loading progress:', error);
+    }
+  }
+
+  // Update progress display
+  function updateProgressDisplay() {
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    
+    if (progressBar && progressText) {
+      progressBar.style.width = `${currentProgress}%`;
+      progressText.textContent = `${currentProgress}% Complete`;
+    }
+  }
+
+  // Start learning the course
+  async function startLearning() {
+    try {
+      const response = await fetch(`/api/courses/${courseId}/start-learning`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ userId, progress: 1 })
+      });
+      
+      if (response.ok) {
+        currentProgress = 1;
+        updateProgressDisplay();
+        alert('Course started! Your progress will be tracked.');
+      }
+    } catch (error) {
+      console.error('Error starting course:', error);
+      alert('Error starting course. Please try again.');
+    }
+  }
+
+  // Start a specific lesson
+  async function startLesson(lessonId) {
+    try {
+      const response = await fetch(`/api/courses/${courseId}/lessons/${lessonId}/progress`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ userId, progress: 10, completed: false })
+      });
+      
+      if (response.ok) {
+        alert('Lesson started! This is a preview - full lesson functionality coming soon.');
+      }
+    } catch (error) {
+      console.error('Error starting lesson:', error);
+      alert('Error starting lesson. Please try again.');
+    }
+  }
+
+  // Show progress details
+  function showProgress() {
+    alert(`Current Progress: ${currentProgress}%\n\nThis is a preview of the course learning interface. Full functionality will be available in the complete version.`);
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', function() {
+    loadProgress();
+  });
+</script>

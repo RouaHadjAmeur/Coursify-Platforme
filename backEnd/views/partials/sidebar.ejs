@@ -1,0 +1,149 @@
+<script>
+  // Define openAddContentModal function that works across all pages
+  // This will be overridden by navbar if it loads after, but provides fallback
+  if (!window.openAddContentModal) {
+    window.openAddContentModal = async function openAddContentModal() {
+      try {
+        console.log('openAddContentModal called from sidebar');
+        
+        // Wait for DOM to be ready
+        const checkModal = () => {
+          return document.getElementById('addContentModal');
+        };
+        
+        let modal = checkModal();
+        
+        // If modal not found immediately, wait a bit for it to load
+        if (!modal) {
+          console.log('Modal not found immediately, waiting for DOM...');
+          await new Promise(resolve => {
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', resolve);
+            } else {
+              setTimeout(resolve, 100);
+            }
+          });
+          modal = checkModal();
+        }
+        
+        // If still not found and we're not on courses page, navigate there
+        if (!modal) {
+          const currentPath = window.location.pathname;
+          if (currentPath !== '/courses') {
+            console.log('Modal not found, navigating to courses page...');
+            window.location.href = '/courses#openAddContent';
+            return;
+          } else {
+            // We're on courses page but modal still not found - wait a bit more
+            console.log('On courses page but modal not found, waiting...');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            modal = checkModal();
+            if (!modal) {
+              console.error('Modal still not found on courses page after waiting');
+              alert('Add Content modal is loading. Please try again in a moment.');
+              return;
+            }
+          }
+        }
+        
+        // Modal exists, use the real function if available, otherwise implement it
+        if (window._openAddContentModalReal && typeof window._openAddContentModalReal === 'function') {
+          console.log('Using navbar\'s openAddContentModal function');
+          return window._openAddContentModalReal();
+        }
+        
+        // Fallback: implement the modal opening logic
+        console.log('Using fallback modal opening logic');
+        
+        // Load courses
+        const response = await fetch('/api/courses', { credentials: 'include' });
+        if (!response.ok) {
+          throw new Error('Failed to load courses');
+        }
+        const courses = await response.json();
+        
+        console.log('Courses loaded:', courses.length);
+        
+        const courseSelect = document.getElementById('addContentCourseSelect');
+        if (courseSelect) {
+          courseSelect.innerHTML = '<option value="">Select a course...</option>' + 
+            courses.map(c => `<option value="${c.id}">${c.title || c.id}</option>`).join('');
+        } else {
+          console.error('addContentCourseSelect element not found!');
+        }
+        
+        // Show the modal
+        modal.classList.remove('hidden');
+        console.log('Modal should now be visible');
+      } catch (error) {
+        console.error('Error in openAddContentModal:', error);
+        alert('Error loading courses: ' + error.message);
+      }
+    };
+  }
+</script>
+<!-- Sidebar -->
+<aside class="hidden md:block w-60 bg-white border-r border-black/5 p-4">
+  <div class="flex items-center gap-2 mb-6 px-2">
+    <div class="grid h-8 w-8 place-items-center rounded-lg bg-lightblue font-bold">C</div>
+    <span class="font-semibold">Coursify Admin</span>
+  </div>
+  <nav class="space-y-1 text-sm">
+    <a href="/" data-path="/" class="sidebar-link block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-50">
+      <span class="flex items-center gap-2">📊 Dashboard</span>
+    </a>
+    <a href="/staff" data-path="/staff" class="sidebar-link block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-50">👥 All Staff</a>
+    <a href="/new-staff" data-path="/new-staff" class="sidebar-link flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+      <span class="font-medium">New Staff</span>
+      <span id="notificationCount" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1 hidden">0</span>
+    </a>
+    <a href="/courses" data-path="/courses" class="sidebar-link block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-50">
+      <span class="flex items-center gap-2">📚 Courses</span>
+    </a>
+    <button id="addContentSidebarBtn" class="w-full text-left rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+      <span> Add Content</span>
+    </button>
+    <a href="/analytics" data-path="/analytics" class="sidebar-link block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-50">📈 Analytics</a>
+    <a href="/settings" data-path="/settings" class="sidebar-link block rounded-lg px-3 py-2 text-gray-700 hover:bg-gray-50">⚙️ Settings</a>
+  </nav>
+</aside>
+<script>
+  // Setup Add Content button event listener
+  document.addEventListener('DOMContentLoaded', function() {
+    const addContentBtn = document.getElementById('addContentSidebarBtn');
+    if (addContentBtn) {
+      addContentBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Add Content button clicked');
+        
+        // Check if function exists
+        if (typeof window.openAddContentModal === 'function') {
+          console.log('Calling openAddContentModal');
+          window.openAddContentModal();
+        } else {
+          console.error('openAddContentModal function not found');
+          // Try again after a short delay in case script hasn't loaded yet
+          setTimeout(function() {
+            if (typeof window.openAddContentModal === 'function') {
+              console.log('Calling openAddContentModal after delay');
+              window.openAddContentModal();
+            } else {
+              console.error('openAddContentModal still not found after delay');
+              // Navigate to courses page as fallback
+              window.location.href = '/courses';
+            }
+          }, 500);
+        }
+      });
+    } else {
+      console.error('addContentSidebarBtn not found');
+    }
+  });
+</script>

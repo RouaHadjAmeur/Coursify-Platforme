@@ -1,0 +1,44 @@
+  </div>
+
+  <script>
+    // Highlight the active link
+    document.addEventListener("DOMContentLoaded", () => {
+      const currentPath = window.location.pathname;
+      document.querySelectorAll(".sidebar-link").forEach(link => {
+        if (currentPath === link.getAttribute("data-path")) {
+          link.classList.add("bg-emerald-50", "text-emerald-700", "font-semibold");
+        } else {
+          link.classList.remove("bg-emerald-50", "text-emerald-700", "font-semibold");
+        }
+      });
+    });
+
+    // Load current user
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch('/api/auth/status', { credentials: 'include' });
+        const data = await response.json();
+        document.getElementById('currentUserName').textContent = data.isAuthenticated ? data.user.name : 'Not Authenticated';
+      } catch {
+        document.getElementById('currentUserName').textContent = 'Error Loading User';
+      }
+    }
+
+    // Logout function
+    async function logout() {
+      try {
+        const response = await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        if (response.ok) window.location.href = 'http://localhost:5173/login';
+        else alert('Error logging out');
+      } catch {
+        alert('Error logging out');
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadCurrentUser();
+    });
+  </script>
+</body>
+</html>

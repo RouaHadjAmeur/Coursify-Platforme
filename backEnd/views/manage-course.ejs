@@ -1,0 +1,780 @@
+<%- include('partials/head', { title: `Manage Course: ${course.title} - Coursify Admin` }) %>
+
+    <%- include('partials/sidebar') %>
+
+    <!-- Right column -->
+    <div class="flex-1 flex flex-col">
+      <%- include('partials/navbar', { 
+        title: `Manage Course: ${course.title}`,
+        backButton: { href: '/courses' },
+        actionButton: { 
+          text: '👁️ Preview Course', 
+          onclick: `previewCourse('${course.id}')` 
+        }
+      }) %>
+
+      <!-- Main Content -->
+      <main class="mx-auto w-full max-w-7xl p-4 md:p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Manage Course: <%= course.title %></h1>
+          <p class="text-gray-600">Add and manage lessons for this course</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Course Info Sidebar -->
+          <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4">Course Information</h3>
+              <div class="space-y-3">
+                <div>
+                  <span class="text-sm font-medium text-gray-500">Title:</span>
+                  <p class="text-gray-900"><%= course.title %></p>
+                </div>
+                <div>
+                  <span class="text-sm font-medium text-gray-500">Instructor:</span>
+                  <p class="text-gray-900"><%= course.instructor %></p>
+                </div>
+                <div>
+                  <span class="text-sm font-medium text-gray-500">Status:</span>
+                  <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium <%= course.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' %>">
+                    <%= course.status === 'published' ? 'Published' : 'Draft' %>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+<!-- Quick Actions -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+  <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+  <div class="space-y-3">
+    <!-- Keep existing Add Lesson button -->
+    <button onclick="addLesson()" class="w-full px-4 py-2 bg-lightblue hover:bg-[#9BC0C3] text-white rounded-lg transition-colors">
+      ➕ Add New Lesson
+    </button>
+
+   <!-- now opens selector first -->
+    <button onclick="openQuickChapter()" class="w-full px-4 py-2 bg-puce hover:bg-[#A86B7F] text-white rounded-lg transition-colors">
+      📚 Add New Chapter
+    </button>
+
+    <!-- now opens selector first -->
+    <button onclick="openQuickQuiz()" class="w-full px-4 py-2 bg-melon hover:bg-[#F59A8A] text-white rounded-lg transition-colors">
+      🧩 Add New Quiz
+    </button>
+  </div>
+</div>
+
+          </div>
+
+          <!-- Lessons Management -->
+          <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <h2 class="text-lg font-semibold text-gray-900">Lessons</h2>
+                    <p class="text-gray-600 text-sm mt-1">Manage the lessons in this course</p>
+                  </div>
+                  <button onclick="addLesson()" class="bg-lightblue hover:bg-[#9BC0C3] text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Add Lesson
+                  </button>
+                </div>
+              </div>
+              
+              <div id="lessonsList" class="divide-y divide-gray-200">
+                <!-- Lessons will be loaded here -->
+                <div class="p-6 text-center">
+                  <div class="text-gray-400 mb-4">
+                    <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-medium text-gray-900 mb-2">No lessons yet</h3>
+                  <p class="text-gray-600 mb-4">Start by adding your first lesson to this course.</p>
+                  <button onclick="addLesson()" class="bg-lightblue hover:bg-[#9BC0C3] text-white px-4 py-2 rounded-lg transition-colors">
+                    Add First Lesson
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Lesson Modal -->
+  <div id="addLessonModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Add New Lesson</h3>
+        <button onclick="closeAddLessonModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form id="addLessonForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Lesson Title</label>
+          <input type="text" id="lessonTitle" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <textarea id="lessonDescription" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Order</label>
+            <input type="number" id="lessonOrder" min="1" value="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Duration</label>
+            <input type="text" id="lessonDuration" placeholder="e.g., 2 hours" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+          <select id="lessonStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="DRAFT">DRAFT</option>
+            <option value="PUBLISHED">PUBLISHED</option>
+            <option value="ARCHIVED">ARCHIVED</option>
+          </select>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" onclick="closeAddLessonModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+            Cancel
+          </button>
+          <button type="submit" class="px-4 py-2 bg-lightblue hover:bg-[#9BC0C3] text-white rounded-lg transition-colors">
+            Add Lesson
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Quick Add: Select Lesson Modal -->
+  <div id="selectLessonModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Select Lesson</h3>
+        <button onclick="closeSelectLessonModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <label class="block text-sm font-medium text-gray-700">Lesson</label>
+        <select id="selectLessonDropdown" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></select>
+        <div class="flex justify-end gap-3 pt-2">
+          <button type="button" onclick="closeSelectLessonModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+          <button type="button" onclick="proceedQuickAdd()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Add: Chapter Modal -->
+  <div id="quickChapterModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Add New Chapter</h3>
+        <button onclick="closeQuickChapterModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <form id="quickChapterForm" class="space-y-4">
+        <input type="hidden" id="quickChapterLessonId">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Chapter Title</label>
+          <input type="text" id="quickChapterTitle" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Sections</label>
+          <div id="quickSectionsContainer" class="space-y-4"></div>
+          <div class="flex items-center gap-2 mt-2">
+            <button type="button" onclick="quickAddSection()" class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm">➕ Add Section</button>
+            <span class="text-xs text-gray-500">Add multiple sections (text, video, image, audio, pdf)</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Order</label>
+            <input type="number" id="quickChapterOrder" min="1" value="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Duration</label>
+            <input type="text" id="quickChapterDuration" placeholder="e.g., 30 min" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+          </div>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" id="quickChapterPublished" class="h-4 w-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+          <label for="quickChapterPublished" class="ml-2 text-sm text-gray-700">Publish immediately</label>
+        </div>
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" onclick="closeQuickChapterModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-puce hover:bg-[#A86B7F] text-white rounded-lg transition-colors">Add Chapter</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Quick Add: Quiz Modal -->
+  <div id="quickQuizModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-3xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Add New Quiz</h3>
+        <button onclick="closeQuickQuizModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      <form id="quickQuizForm" class="space-y-4">
+        <input type="hidden" id="quickQuizLessonId">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Quiz Title</label>
+            <input type="text" id="quickQuizTitle" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <input type="text" id="quickQuizDescription" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Time Limit (minutes)</label>
+            <input type="number" id="quickQuizTimeLimit" min="1" value="30" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Passing Score (%)</label>
+            <input type="number" id="quickQuizPassingScore" min="1" max="100" value="70" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Questions</label>
+          <div id="quickQuestionsContainer" class="space-y-4"></div>
+          <button type="button" onclick="quickAddQuestion()" class="mt-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">➕ Add Question</button>
+        </div>
+        <div class="flex items-center">
+          <input type="checkbox" id="quickQuizPublished" class="h-4 w-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+          <label for="quickQuizPublished" class="ml-2 text-sm text-gray-700">Publish immediately</label>
+        </div>
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" onclick="closeQuickQuizModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-melon hover:bg-[#F59A8A] text-white rounded-lg transition-colors">Add Quiz</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script>
+    let lessons = [];
+    let quickType = null;
+
+    // Load lessons on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadLessons();
+    });
+
+
+    function renderLessons() {
+      const container = document.getElementById('lessonsList');
+      
+      if (lessons.length === 0) {
+        container.innerHTML = `
+          <div class="p-6 text-center">
+            <div class="text-gray-400 mb-4">
+              <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No lessons yet</h3>
+            <p class="text-gray-600 mb-4">Start by adding your first lesson to this course.</p>
+            <button onclick="addLesson()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              Add First Lesson
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lesson</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Content</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              ${lessons.map((lesson, index) => `
+                <tr class="hover:bg-gray-50">
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <div class="flex-shrink-0 w-8 h-8 bg-lightblue/20 rounded-full flex items-center justify-center">
+                        <span class="text-sm font-medium text-lightblue">${index + 1}</span>
+                      </div>
+                      <div>
+                        <div class="font-medium text-gray-900">${lesson.title}</div>
+                        <div class="text-sm text-gray-500">${lesson.description || 'No description'}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-900">${lesson.duration || '-'}</td>
+                  <td class="px-6 py-4 text-sm text-gray-900">
+                    <div class="flex items-center gap-4">
+                      <span>📚 ${('chaptersCount' in lesson ? lesson.chaptersCount : (lesson.chapters ? lesson.chapters.length : 0))} chapters</span>
+                      <span>🧩 ${('quizzesCount' in lesson ? lesson.quizzesCount : (lesson.quizzes ? lesson.quizzes.length : 0))} quizzes</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${lesson.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-800' : lesson.status === 'ARCHIVED' ? 'bg-gray-100 text-gray-800' : 'bg-amber-100 text-amber-800'}">
+                        ${lesson.status || 'DRAFT'}
+                      </span>
+  <button onclick="toggleLessonStatus('${lesson.id}', '${lesson.status || 'DRAFT'}')" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Toggle Status">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
+</button>                    </div>
+                  </td>
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                      <button onclick="editLesson('${lesson.id}')" class="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Edit Lesson">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                      </button>
+                  <button onclick="promptEditLesson('${lesson.id}')" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Quick Edit">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M4 13v7h7l9-9a2.5 2.5 0 10-3.536-3.536L7.5 16.5 4 13z" /></svg>
+                  </button>
+                      <button onclick="manageLesson('${lesson.id}')" class="p-2 text-gray-400 hover:text-lightblue hover:bg-lightblue/10 rounded-lg transition-colors" title="Manage Lesson">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      </button>
+                      <button onclick="deleteLesson('${lesson.id}')" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Lesson">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // Load lessons for this course
+    async function loadLessons() {
+      try {
+        const response = await fetch('/api/lessons/course/<%= course.id %>', {
+          credentials: 'include'
+        });
+        if (response.ok) {
+          lessons = await response.json();
+          // Ensure stable order by lesson.order
+          if (Array.isArray(lessons)) {
+            lessons.sort((a, b) => (a.order || 0) - (b.order || 0));
+          }
+          renderLessons();
+        } else {
+          console.error('Error loading lessons list');
+          lessons = [];
+          renderLessons();
+        }
+      } catch (error) {
+        console.error('Error loading lessons:', error);
+        lessons = [];
+        renderLessons();
+      }
+    }
+
+    function addLesson() {
+      document.getElementById('addLessonModal').classList.remove('hidden');
+    }
+
+    function closeAddLessonModal() {
+      document.getElementById('addLessonModal').classList.add('hidden');
+      document.getElementById('addLessonForm').reset();
+    }
+
+    // Edit lesson
+    function editLesson(lessonId) {
+      window.location.href = `/manage-lesson/${lessonId}`;
+    }
+
+    async function toggleLessonStatus(lessonId, currentStatus) {
+      const order = ['DRAFT','PUBLISHED','ARCHIVED'];
+      const next = currentStatus === 'DRAFT' ? 'PUBLISHED' : currentStatus === 'PUBLISHED' ? 'ARCHIVED' : 'DRAFT';
+      try {
+        const resp = await fetch(`/api/lessons/${lessonId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: next })
+        });
+        if (resp.ok) {
+          await loadLessons();
+        } else {
+          alert('Failed to update status');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Failed to update status');
+      }
+    }
+
+    async function promptEditLesson(lessonId) {
+      const title = prompt('New title (leave blank to keep)');
+      const description = prompt('New description (leave blank to keep)');
+      const order = prompt('Order (number, leave blank to keep)');
+      const duration = prompt('Duration (leave blank to keep)');
+      const payload = {};
+      if (title) payload.title = title;
+      if (description) payload.description = description;
+      if (order) payload.order = parseInt(order);
+      if (duration) payload.duration = duration;
+      if (Object.keys(payload).length === 0) return;
+      try {
+        const resp = await fetch(`/api/lessons/${lessonId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+        if (resp.ok) {
+          await loadLessons();
+          alert('Lesson updated');
+        } else {
+          alert('Failed to update lesson');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Failed to update lesson');
+      }
+    }
+
+    // Manage lesson (chapters and quizzes)
+    function manageLesson(lessonId) {
+      window.location.href = `/manage-lesson/${lessonId}`;
+    }
+
+    // Quick Actions: select lesson then open respective manage page anchored to section
+    function openSelectLessonFor(type) {
+      if (!Array.isArray(lessons) || lessons.length === 0) {
+        alert('Please add a lesson first.');
+        return;
+      }
+      quickType = type;
+      const ddl = document.getElementById('selectLessonDropdown');
+      ddl.innerHTML = lessons.map(l => `<option value="${l.id}">${(l.title || '').trim() || l.id}</option>`).join('');
+      document.getElementById('selectLessonModal').classList.remove('hidden');
+    }
+
+    function openQuickChapter(){ openSelectLessonFor('chapter'); }
+    function openQuickQuiz(){ openSelectLessonFor('quiz'); }
+
+    function closeSelectLessonModal(){
+      document.getElementById('selectLessonModal').classList.add('hidden');
+    }
+
+    function proceedQuickAdd(){
+      const lid = document.getElementById('selectLessonDropdown').value;
+      closeSelectLessonModal();
+      if (quickType === 'chapter') {
+        document.getElementById('quickChapterLessonId').value = lid;
+        document.getElementById('quickChapterModal').classList.remove('hidden');
+      } else if (quickType === 'quiz') {
+        document.getElementById('quickQuizLessonId').value = lid;
+        document.getElementById('quickQuizModal').classList.remove('hidden');
+      }
+    }
+
+    function closeQuickChapterModal(){ document.getElementById('quickChapterModal').classList.add('hidden'); }
+    function closeQuickQuizModal(){ document.getElementById('quickQuizModal').classList.add('hidden'); }
+
+    // Quick Chapter submit
+    document.addEventListener('DOMContentLoaded', () => {
+      const f = document.getElementById('quickChapterForm');
+      if (f) f.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const payload = {
+          title: document.getElementById('quickChapterTitle').value,
+          lessonId: document.getElementById('quickChapterLessonId').value,
+          order: parseInt(document.getElementById('quickChapterOrder').value) || 1,
+          duration: document.getElementById('quickChapterDuration').value,
+          isPublished: document.getElementById('quickChapterPublished').checked,
+          sections: Array.from(document.querySelectorAll('#quickSectionsContainer > div')).map(div => {
+            const type = div.querySelector('[data-s="type"]').value;
+            const contentInput = div.querySelector('[data-s="content"]');
+            const fileInput = div.querySelector('[data-s="file"]');
+            let content = contentInput ? contentInput.value : '';
+            if (fileInput && fileInput.files && fileInput.files[0]) {
+              content = fileInput.files[0].name; // backend import can be added later; here we save name
+            }
+            return { type, content };
+          })
+        };
+        try{
+          const resp = await fetch('/api/chapters', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+          if (resp.ok){ closeQuickChapterModal(); await loadLessons(); alert('Chapter added'); }
+          else alert('Error adding chapter');
+        }catch(err){ console.error(err); alert('Error adding chapter'); }
+      });
+    });
+
+    // Dynamic section builder
+    function quickAddSection(){
+      const c = document.getElementById('quickSectionsContainer');
+      const div = document.createElement('div');
+      div.className = 'border border-gray-200 rounded-lg p-4';
+      const id = Math.random().toString(36).slice(2);
+      div.innerHTML = `
+        <div class="grid grid-cols-2 gap-4 items-start">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+            <select data-s="type" class="w-full border rounded p-2" onchange="quickOnSectionTypeChange(this)">
+              <option value="text">Text</option>
+              <option value="video">Video</option>
+              <option value="image">Image</option>
+              <option value="audio">Audio</option>
+              <option value="pdf">PDF</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+            <input data-s="content" type="text" placeholder="Text or URL" class="w-full border rounded p-2" />
+            <input data-s="file" type="file" class="hidden mt-2" />
+          </div>
+        </div>
+        <div class="flex justify-end mt-2">
+          <button type="button" class="text-red-600 text-sm" onclick="this.closest('div.border').remove()">Remove</button>
+        </div>`;
+      c.appendChild(div);
+    }
+
+    function quickOnSectionTypeChange(sel){
+      const wrap = sel.closest('div.border');
+      if (!wrap) return;
+      const type = sel.value;
+      const contentInput = wrap.querySelector('[data-s="content"]');
+      const fileInput = wrap.querySelector('[data-s="file"]');
+      if (type === 'image' || type === 'audio' || type === 'pdf'){
+        fileInput.classList.remove('hidden');
+        contentInput.placeholder = 'Optional URL or description';
+      } else {
+        fileInput.classList.add('hidden');
+        contentInput.placeholder = type === 'text' ? 'Text content' : 'Video URL (YouTube/Vimeo)';
+      }
+    }
+
+    // Quick Quiz form dynamic questions
+    function quickAddQuestion(){
+      const c = document.getElementById('quickQuestionsContainer');
+      const div = document.createElement('div');
+      div.className = 'border border-gray-200 rounded-lg p-4';
+      div.innerHTML = `
+        <div class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Question</label>
+            <input type="text" class="w-full border rounded p-2" data-q="text" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Options (one per line)</label>
+            <textarea rows="3" class="w-full border rounded p-2" data-q="options"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Correct Answer indexes (comma separated)</label>
+            <input type="text" class="w-full border rounded p-2" placeholder="0,2" data-q="correct" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Explanation (optional)</label>
+            <input type="text" class="w-full border rounded p-2" data-q="explanation" />
+          </div>
+        </div>`;
+      c.appendChild(div);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const fq = document.getElementById('quickQuizForm');
+      if (fq) fq.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const lessonId = document.getElementById('quickQuizLessonId').value;
+        const title = document.getElementById('quickQuizTitle').value;
+        const description = document.getElementById('quickQuizDescription').value;
+        const timeLimit = parseInt(document.getElementById('quickQuizTimeLimit').value) || 30;
+        const passingScore = parseInt(document.getElementById('quickQuizPassingScore').value) || 70;
+        const published = document.getElementById('quickQuizPublished').checked;
+        const qs = Array.from(document.querySelectorAll('#quickQuestionsContainer > div')).map(div => {
+          const text = div.querySelector('[data-q="text"]').value;
+          const options = (div.querySelector('[data-q="options"]').value || '').split('\n').filter(Boolean);
+          const correct = (div.querySelector('[data-q="correct"]').value || '').split(',').map(s=>parseInt(s.trim())).filter(n=>!Number.isNaN(n));
+          const explanation = div.querySelector('[data-q="explanation"]').value || '';
+          return { question:text, options, correctAnswers: correct, explanation };
+        });
+        const payload = { title, description, lessonId, timeLimit, passingScore, questions: qs, isPublished: published };
+        try{
+          const resp = await fetch('/api/quizzes', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+          if (resp.ok){ closeQuickQuizModal(); await loadLessons(); alert('Quiz added'); }
+          else alert('Error adding quiz');
+        }catch(err){ console.error(err); alert('Error adding quiz'); }
+      });
+    });
+
+    // Delete lesson
+    async function deleteLesson(lessonId) {
+      if (!confirm('Are you sure you want to delete this lesson?')) return;
+      
+      try {
+        const response = await fetch(`/api/courses/<%= course.id %>/lessons/${lessonId}`, {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+
+        if (response.ok) {
+          loadLessons();
+          alert('Lesson deleted successfully!');
+        } else {
+          alert('Error deleting lesson');
+        }
+      } catch (error) {
+        console.error('Error deleting lesson:', error);
+        alert('Error deleting lesson');
+      }
+    }
+
+    // Preview course
+    function previewCourse(courseId) {
+      window.open(`/course-learning/${courseId}`, '_blank');
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadLessons();
+    });
+
+    document.getElementById('addLessonForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const title = document.getElementById('lessonTitle').value.trim();
+      const description = document.getElementById('lessonDescription').value.trim();
+      const courseId = '<%= course.id %>';
+      const orderValue = document.getElementById('lessonOrder').value;
+      const duration = document.getElementById('lessonDuration').value.trim();
+      const status = document.getElementById('lessonStatus').value;
+
+      // Validate required fields
+      if (!title) {
+        alert('Please enter a lesson title');
+        return;
+      }
+      if (!description) {
+        alert('Please enter a lesson description');
+        return;
+      }
+
+      const lessonData = {
+        title: title,
+        description: description,
+        courseId: courseId,
+        order: orderValue ? parseInt(orderValue) : 0,
+        duration: duration || '0 min',
+        status: status || 'DRAFT'
+      };
+
+      try {
+        // Create lesson in standalone lessons collection for consistency
+        const response = await fetch('/api/lessons', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include',
+          body: JSON.stringify(lessonData)
+        });
+
+        if (response.ok) {
+          closeAddLessonModal();
+          loadLessons();
+          alert('Lesson added successfully!');
+        } else {
+          const errorData = await response.json();
+          console.error('Error adding lesson:', errorData);
+          alert('Error adding lesson: ' + (errorData.message || response.statusText));
+        }
+      } catch (error) {
+        console.error('Error adding lesson:', error);
+        alert('Error adding lesson: ' + error.message);
+      }
+    });
+
+
+
+    // Download sample template
+    function downloadSampleTemplate() {
+      const sampleData = {
+        course: {
+          title: "Sample Course",
+          description: "This is a sample course for import",
+          instructor: "Sample Instructor",
+          category: "Technology",
+          level: "Beginner",
+          price: 0,
+          isFree: true,
+          certificate: false,
+          status: "draft"
+        },
+        lessons: [
+          {
+            title: "Introduction to the Topic",
+            description: "Learn the basics of this topic",
+            order: 1,
+            duration: "30 minutes",
+            content: "This is the main content of the lesson...",
+            isPublished: true,
+            chapters: [],
+            quizzes: []
+          },
+          {
+            title: "Advanced Concepts",
+            description: "Dive deeper into advanced topics",
+            order: 2,
+            duration: "45 minutes",
+            content: "Advanced content goes here...",
+            isPublished: false,
+            chapters: [],
+            quizzes: []
+          }
+        ],
+        exportDate: new Date().toISOString(),
+        version: "1.0",
+        instructions: {
+          json_format: "Use this JSON structure for importing lessons",
+          csv_format: "For CSV, use headers: title,description,order,duration,content,isPublished",
+          notes: "Remove the 'id' field when importing - new IDs will be generated automatically"
+        }
+      };
+
+      const dataStr = JSON.stringify(sampleData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'course_import_template.json';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      alert('Sample template downloaded! Use this as a reference for creating your import files.');
+    }
+  </script>
+
+<%- include('partials/footer') %>

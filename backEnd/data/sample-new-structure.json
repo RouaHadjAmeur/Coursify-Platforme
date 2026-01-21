@@ -1,0 +1,272 @@
+{
+  "courses": [
+    {
+      "id": "course_web_dev_2024",
+      "title": "Complete Web Development Course",
+      "description": "Learn full-stack web development from scratch",
+      "level": "beginner",
+      "image": "https://picsum.photos/seed/webdev/600/400",
+      "hours": "40-50 hrs",
+      "learners": 1250,
+      "certificate": true,
+      "price": 199,
+      "category": "Web Development",
+      "instructor": "John Smith",
+      "sections": [
+        {
+          "id": "section_intro",
+          "title": "Part 1: Introduction",
+          "description": "Get started with web development",
+          "order": 1
+        },
+        {
+          "id": "section_frontend",
+          "title": "Part 2: Frontend Development",
+          "description": "HTML, CSS, and JavaScript fundamentals",
+          "order": 2
+        },
+        {
+          "id": "section_backend",
+          "title": "Part 3: Backend Development",
+          "description": "Server-side programming and databases",
+          "order": 3
+        },
+        {
+          "id": "section_fullstack",
+          "title": "Part 4: Full-Stack Projects",
+          "description": "Build complete web applications",
+          "order": 4
+        }
+      ],
+      "skills": ["HTML", "CSS", "JavaScript", "Node.js", "React", "MongoDB"],
+      "participatedUsers": [],
+      "progress": 0,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z",
+      "status": "published"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "lesson_html_basics",
+      "title": "HTML Fundamentals",
+      "description": "Learn the basics of HTML markup",
+      "courseId": "course_web_dev_2024",
+      "order": 1,
+      "duration": "2 hours",
+      "status": "PUBLISHED",
+      "chapters": [],
+      "quizzes": [],
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "lesson_css_styling",
+      "title": "CSS Styling",
+      "description": "Master CSS for beautiful web pages",
+      "courseId": "course_web_dev_2024",
+      "order": 2,
+      "duration": "3 hours",
+      "status": "PUBLISHED",
+      "chapters": [],
+      "quizzes": [],
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "lesson_javascript_basics",
+      "title": "JavaScript Basics",
+      "description": "Introduction to JavaScript programming",
+      "courseId": "course_web_dev_2024",
+      "order": 3,
+      "duration": "4 hours",
+      "status": "DRAFT",
+      "chapters": [],
+      "quizzes": [],
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "chapters": [
+    {
+      "id": "chapter_html_structure",
+      "title": "HTML Document Structure",
+      "description": "Understanding the basic structure of HTML documents",
+      "lessonId": "lesson_html_basics",
+      "order": 1,
+      "duration": "30 min",
+      "sections": [
+        {
+          "id": "section_html_intro",
+          "type": "text",
+          "content": "HTML (HyperText Markup Language) is the standard markup language for creating web pages. It describes the structure of web pages using markup elements.",
+          "order": 1,
+          "createdAt": "2024-01-15T10:00:00.000Z"
+        },
+        {
+          "id": "section_html_example",
+          "type": "video",
+          "content": "https://example.com/videos/html-structure.mp4",
+          "order": 2,
+          "createdAt": "2024-01-15T10:00:00.000Z"
+        },
+        {
+          "id": "section_html_practice",
+          "type": "text",
+          "content": "Practice Exercise: Create a basic HTML document with the following elements:\n- DOCTYPE declaration\n- html element\n- head element with title\n- body element with a heading and paragraph",
+          "order": 3,
+          "createdAt": "2024-01-15T10:00:00.000Z"
+        }
+      ],
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "chapter_html_elements",
+      "title": "HTML Elements and Tags",
+      "description": "Learn about different HTML elements and how to use them",
+      "lessonId": "lesson_html_basics",
+      "order": 2,
+      "duration": "45 min",
+      "sections": [
+        {
+          "id": "section_elements_intro",
+          "type": "text",
+          "content": "HTML elements are the building blocks of HTML pages. They consist of tags, content, and attributes.",
+          "order": 1,
+          "createdAt": "2024-01-15T10:00:00.000Z"
+        },
+        {
+          "id": "section_elements_image",
+          "type": "image",
+          "content": "https://example.com/images/html-elements-diagram.png",
+          "order": 2,
+          "createdAt": "2024-01-15T10:00:00.000Z"
+        },
+        {
+          "id": "section_elements_audio",
+          "type": "audio",
+          "content": "https://example.com/audio/html-elements-explanation.mp3",
+          "order": 3,
+          "createdAt": "2024-01-15T10:00:00.000Z"
+        }
+      ],
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "chapter_css_selectors",
+      "title": "CSS Selectors",
+      "description": "Understanding CSS selectors and how to target elements",
+      "lessonId": "lesson_css_styling",
+      "order": 1,
+      "duration": "40 min",
+      "sections": [
+        {
+          "id": "section_selectors_intro",
+          "type": "text",
+          "content": "CSS selectors are patterns used to select and style HTML elements. They allow you to target specific elements or groups of elements.",
+          "order": 1,
+          "createdAt": "2024-01-15T10:00:00.000Z"
+        },
+        {
+          "id": "section_selectors_pdf",
+          "type": "pdf",
+          "content": "css-selectors-reference.pdf",
+          "filePath": "uploads/chapters/css-selectors-reference.pdf",
+          "originalName": "CSS Selectors Reference.pdf",
+          "fileSize": 1024000,
+          "uploadedAt": "2024-01-15T10:00:00.000Z",
+          "order": 2,
+          "createdAt": "2024-01-15T10:00:00.000Z"
+        }
+      ],
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "quiz_html_basics",
+      "title": "HTML Basics Quiz",
+      "description": "Test your knowledge of HTML fundamentals",
+      "lessonId": "lesson_html_basics",
+      "timeLimit": 15,
+      "passingScore": 70,
+      "questions": [
+        {
+          "id": "q1",
+          "question": "What does HTML stand for?",
+          "options": [
+            "HyperText Markup Language",
+            "High Tech Modern Language",
+            "Home Tool Markup Language",
+            "Hyperlink and Text Markup Language"
+          ],
+          "correctAnswers": [0],
+          "explanation": "HTML stands for HyperText Markup Language."
+        },
+        {
+          "id": "q2",
+          "question": "Which tag is used to create a hyperlink?",
+          "options": [
+            "<link>",
+            "<a>",
+            "<href>",
+            "<url>"
+          ],
+          "correctAnswers": [1],
+          "explanation": "The <a> tag is used to create hyperlinks in HTML."
+        }
+      ],
+      "placement": "end",
+      "isPublished": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    },
+    {
+      "id": "quiz_html_elements",
+      "title": "HTML Elements Quiz",
+      "description": "Quick quiz on HTML elements",
+      "lessonId": "lesson_html_basics",
+      "timeLimit": 10,
+      "passingScore": 80,
+      "questions": [
+        {
+          "id": "q1",
+          "question": "What is the correct HTML element for the largest heading?",
+          "options": [
+            "<h6>",
+            "<heading>",
+            "<h1>",
+            "<head>"
+          ],
+          "correctAnswers": [2],
+          "explanation": "<h1> is the largest heading element in HTML."
+        }
+      ],
+      "placement": "between_chapters",
+      "isPublished": true,
+      "createdAt": "2024-01-15T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z"
+    }
+  ],
+  "sample_usage": {
+    "description": "This file demonstrates the new course structure with examples of all data types and relationships.",
+    "key_features": [
+      "Courses have sections (Part 1, Part 2, etc.)",
+      "Lessons have status: DRAFT, PUBLISHED, ARCHIVED",
+      "Chapters have sections with different types: text, video, image, audio, pdf",
+      "Quizzes can be placed between chapters or at the end",
+      "File upload support for PDFs and other documents",
+      "Export capabilities for chapter content"
+    ],
+    "api_examples": {
+      "get_lesson_with_content": "GET /api/lessons/lesson_html_basics/content",
+      "import_chapter_from_file": "POST /api/chapters/import",
+      "export_chapter": "GET /api/chapters/chapter_html_structure/export?format=json",
+      "update_lesson_status": "PATCH /api/lessons/lesson_javascript_basics/status",
+      "add_section_to_chapter": "POST /api/chapters/chapter_html_structure/sections"
+    }
+  }
+}

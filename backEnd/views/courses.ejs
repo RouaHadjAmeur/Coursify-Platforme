@@ -1,0 +1,1514 @@
+<%- include('partials/head', { title: 'Admin Dashboard - Coursify' }) %>
+
+    <%- include('partials/sidebar') %>
+
+    <!-- Right column -->
+    <div class="flex-1 flex flex-col">
+      <!-- Topbar -->
+     <header class="h-14 border-b border-black/5 bg-white flex items-center justify-between px-4">
+  <div class="flex items-center gap-3">
+    <h1 class="text-lg font-semibold text-gray-900">Admin Dashboard</h1>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <!-- Notifications -->
+    <div class="relative">
+      <button id="notificationBtn" class="grid place-items-center h-9 w-9 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+        🔔
+        <span id="notificationBadgeTop" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+      </button>
+
+      <!-- Notification dropdown -->
+      <div id="notificationDropdown" class="hidden absolute right-0 top-12 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div class="p-3 border-b border-gray-200">
+          <h3 class="font-semibold text-gray-900">Notifications</h3>
+        </div>
+        <div id="notificationList" class="max-h-64 overflow-y-auto">
+          <% const notificationPendingUsers = users ? users.filter(u => u.status === 'Pending') : []; %>
+          <% if (notificationPendingUsers.length > 0) { %>
+            <% notificationPendingUsers.forEach(user => { %>
+              <div class="p-3 border-b border-gray-100 hover:bg-gray-50">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                    <span class="text-amber-600 text-sm">⏳</span>
+                  </div>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-900">New staff member: <%= user.name %></p>
+                    <p class="text-xs text-gray-500"><%= user.email %> - <%= user.role %></p>
+                  </div>
+                  <button onclick="approveUser('<%= user.id %>')" class="text-xs bg-green-500 text-white px-2 py-1 rounded">Approve</button>
+                  <button onclick="rejectUser('<%= user.id %>')" class="text-xs bg-red-500 text-white px-2 py-1 rounded">Reject</button>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <div class="p-3 text-center text-gray-500">
+              No pending notifications
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current User -->
+    <div class="flex items-center gap-2">
+      <span class="text-sm text-gray-600">Welcome,</span>
+      <span id="currentUserName" class="text-sm font-semibold text-gray-900">Admin</span>
+    </div>
+
+    <button 
+      onclick="logout()"
+      class="px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+    >
+      Logout
+    </button>
+  </div>
+</header>
+      <!-- Main Content -->
+      <main class="mx-auto w-full max-w-7xl p-4 md:p-6">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Course Management</h1>
+          <p class="text-gray-600">Manage all courses in the platform</p>
+        </div>
+
+        <div class="mb-6">
+          <button onclick="openAddCourseModal()" class="bg-lightblue hover:bg-[#9BC0C3] text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add New Course
+          </button>
+        </div>
+
+        <!-- Courses Table -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">All Courses</h2>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Course</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instructor</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Skills</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="coursesTableBody" class="bg-white divide-y divide-gray-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Course Modal -->
+  <div id="addCourseModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Add New Course</h3>
+        <button onclick="closeAddCourseModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      
+      <form id="addCourseForm" class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+            <input type="text" id="courseTitle" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+          </div>
+
+          <!-- CATEGORY: select existing OR add new manually -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+            <div class="grid grid-cols-1 gap-2">
+              <select id="courseCategorySelect" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"></select>
+              <input id="courseCategoryNew" type="text" placeholder="Or add a new category" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+              <p class="text-xs text-gray-500">If you type a new category, it will be used.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Level *</label>
+            <select id="courseLevel" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+              <option value="">Select Level</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Instructor *</label>
+            <select id="courseInstructor" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+              <option value="">Select Instructor</option>
+              <% if (users) { %>
+                <% users.filter(u => u.role === 'instructor').forEach(user => { %>
+                  <option value="<%= user.name %>"><%= user.name %> (<%= user.email %>)</option>
+                <% }); %>
+              <% } %>
+            </select>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+          <textarea id="courseDescription" rows="3" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"></textarea>
+        </div>
+
+        <!-- SKILLS: multi-select (from options) + manual add as chips -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Skills to learn</label>
+          <div class="rounded-lg border border-gray-300 p-3">
+            <!-- existing skills options -->
+            <div class="mb-2">
+              <select id="addSkillsSelect" multiple class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm h-28"></select>
+              <p class="text-[11px] text-gray-500 mt-1">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</p>
+            </div>
+            <div id="addSkillsChips" class="flex flex-wrap gap-2 mb-2"></div>
+            <div class="flex items-center gap-2">
+              <input id="addSkillInput" list="skillsDatalist" type="text" placeholder="Type a skill and press Enter"
+                     class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm">
+              <button type="button" id="addSkillBtn" class="px-3 py-2 text-sm rounded-lg bg-[#C08497] text-white hover:opacity-90">Add</button>
+            </div>
+            <datalist id="skillsDatalist"></datalist>
+            <p class="text-xs text-gray-500 mt-2">Select from the list or add a new skill manually. New skills are remembered.</p>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Course Image</label>
+            <input type="file" id="courseImageFile" accept="image/*" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+            <p class="text-xs text-gray-500 mt-1">Upload an image from your device (max 2MB)</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Duration (hours)</label>
+            <input type="text" id="courseHours" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="2-3 hrs">
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="courseCertificate" class="rounded border-gray-300">
+            <span class="text-sm text-gray-700">Certificate Available</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="courseFree" class="rounded border-gray-300" checked onchange="togglePriceField()">
+            <span class="text-sm text-gray-700">Free Course</span>
+          </label>
+        </div>
+        
+        <div id="priceField" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Course Price ($)</label>
+          <input type="number" id="coursePrice" min="0" step="0.01" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="29.99">
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button type="submit" class="flex-1 bg-lightblue hover:bg-[#9BC0C3] text-white py-2 rounded-lg font-medium transition-colors">Create Course</button>
+          <button type="button" onclick="closeAddCourseModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-400 transition-colors">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Course Modal -->
+  <div id="editCourseModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-xl font-semibold text-gray-900">Edit Course</h3>
+        <button onclick="closeEditCourseModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+      
+      <form id="editCourseForm" class="space-y-4">
+        <input type="hidden" id="editCourseId">
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+            <input type="text" id="editCourseTitle" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+          </div>
+
+          <!-- CATEGORY (edit): select existing OR add new -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+            <div class="grid grid-cols-1 gap-2">
+              <select id="editCourseCategorySelect" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"></select>
+              <input id="editCourseCategoryNew" type="text" placeholder="Or add a new category" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+            </div>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Level *</label>
+            <select id="editCourseLevel" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+              <option value="">Select Level</option>
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Instructor *</label>
+            <select id="editCourseInstructor" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+              <option value="">Select Instructor</option>
+              <% if (users) { %>
+                <% users.filter(u => u.role === 'instructor').forEach(user => { %>
+                  <option value="<%= user.name %>"><%= user.name %> (<%= user.email %>)</option>
+                <% }); %>
+              <% } %>
+            </select>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Description *</label>
+          <textarea id="editCourseDescription" rows="3" required class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"></textarea>
+        </div>
+
+        <!-- SKILLS (edit): multi-select existing + manual add as chips -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Skills to learn</label>
+          <div class="rounded-lg border border-gray-300 p-3">
+            <div class="mb-2">
+              <select id="editSkillsSelect" multiple class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm h-28"></select>
+              <p class="text-[11px] text-gray-500 mt-1">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</p>
+            </div>
+            <div id="editSkillsChips" class="flex flex-wrap gap-2 mb-2"></div>
+            <div class="flex items-center gap-2">
+              <input id="editSkillInput" list="skillsDatalist" type="text" placeholder="Type a skill and press Enter" class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm">
+              <button type="button" id="editSkillBtn" class="px-3 py-2 text-sm rounded-lg bg-[#C08497] text-white hover:opacity-90">Add</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Course Image</label>
+            <input type="file" id="editCourseImageFile" accept="image/*" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+            <p class="text-xs text-gray-500 mt-1">Upload an image from your device (max 2MB)</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Duration (hours)</label>
+            <input type="text" id="editCourseHours" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+          </div>
+        </div>
+        
+        <div class="flex items-center gap-4">
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="editCourseCertificate" class="rounded border-gray-300">
+            <span class="text-sm text-gray-700">Certificate Available</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="checkbox" id="editCourseFree" class="rounded border-gray-300" onchange="toggleEditPriceField()">
+            <span class="text-sm text-gray-700">Free Course</span>
+          </label>
+        </div>
+        
+        <div id="editPriceField" class="hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Course Price ($)</label>
+          <input type="number" id="editCoursePrice" min="0" step="0.01" class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" placeholder="29.99">
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button type="submit" class="flex-1 bg-lightblue hover:bg-[#9BC0C3] text-white py-2 rounded-lg font-medium transition-colors">Update Course</button>
+          <button type="button" onclick="closeEditCourseModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-400 transition-colors">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- VIEW COURSE Modal -->
+<div id="viewCourseModal" class="hidden fixed inset-0 flex items-center justify-center z-50" style="background-color: rgba(0, 0, 0, 0.3);" aria-hidden="true">
+  <div id="viewCourseModalCard" class="bg-white rounded-lg p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto relative">
+    <div class="flex items-start justify-between mb-4 gap-4">
+      <div class="flex items-center gap-4">
+        <img id="viewCourseImage" src="https://via.placeholder.com/96x96" alt="Course image" class="w-24 h-24 rounded-lg object-cover border">
+        <div>
+          <h3 id="viewCourseTitle" class="text-2xl font-semibold text-gray-900"></h3>
+          <div id="viewCourseMeta" class="text-sm text-gray-500 mt-1"></div>
+        </div>
+      </div>
+
+      <button id="closeViewCourseBtn" onclick="closeViewCourseModal()" class="text-gray-400 hover:text-gray-600 transition-colors" aria-label="Close view">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4">
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Description</label>
+        <p id="viewCourseDescription" class="text-sm text-gray-700"></p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Category</label>
+          <div id="viewCourseCategory" class="text-sm text-gray-800"></div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Level</label>
+          <div id="viewCourseLevel" class="text-sm text-gray-800"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Instructor</label>
+          <div id="viewCourseInstructor" class="text-sm text-gray-800"></div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Duration (hours)</label>
+          <div id="viewCourseHours" class="text-sm text-gray-800"></div>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Skills to learn</label>
+        <div id="viewCourseSkills" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Price</label>
+          <div id="viewCoursePrice" class="text-sm text-gray-800"></div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Certificate</label>
+          <div id="viewCourseCertificate" class="text-sm text-gray-800"></div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+          <div id="viewCourseStatus" class="text-sm text-gray-800"></div>
+        </div>
+      </div>
+
+      <div class="pt-4 flex justify-end gap-3">
+        <button type="button" onclick="closeViewCourseModal()" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-400 transition-colors">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script>
+    let allCourses = <%- JSON.stringify(courses || []) %>;
+
+    // Dynamic sources kept in-memory (synced from existing courses)
+    let categoryOptions = [];
+    let skillOptions = [];
+
+    // Track selected/added skills per form
+    let addFormSkills = [];
+    let editFormSkills = [];
+
+    const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+    const ALLOWED_IMAGE_PREFIX = "image/";
+
+    const uniqi = (arr) => {
+      const seen = new Set();
+      const out = [];
+      for (const s of arr) {
+        const key = (s || "").trim().toLowerCase();
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        out.push(s.trim());
+      }
+      return out;
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadCurrentUser();
+      bootstrapCategoryAndSkills();
+      populateCategorySelects();
+      populateSkillsSelects();
+      populateSkillsDatalist();
+      bindSkillsInputs();
+      bindSkillsMultiSelects();
+      loadCoursesTable();
+    });
+
+    function bootstrapCategoryAndSkills() {
+      const base = ["Business","Marketing","Technology","Design","Management"];
+      const fromCourses = (allCourses || []).map(c => c?.category).filter(Boolean);
+      categoryOptions = uniqi([...base, ...fromCourses]).sort((a,b)=>a.localeCompare(b));
+
+      const skillsFromCourses = (allCourses || [])
+        .flatMap(c => Array.isArray(c?.skills) ? c.skills : [])
+        .filter(Boolean);
+      skillOptions = uniqi(skillsFromCourses).sort((a,b)=>a.localeCompare(b));
+    }
+
+    function populateCategorySelects() {
+      const selects = [document.getElementById('courseCategorySelect'), document.getElementById('editCourseCategorySelect')];
+      selects.forEach(sel => {
+        if (!sel) return;
+        sel.innerHTML = `<option value="">Select Category</option>` + categoryOptions.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+      });
+    }
+
+    function populateSkillsSelects() {
+      const selects = [document.getElementById('addSkillsSelect'), document.getElementById('editSkillsSelect')];
+      selects.forEach(sel => {
+        if (!sel) return;
+        sel.innerHTML = skillOptions.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
+      });
+    }
+
+    function populateSkillsDatalist() {
+      const dl = document.getElementById('skillsDatalist');
+      if (!dl) return;
+      dl.innerHTML = skillOptions.map(s => `<option value="${escapeHtml(s)}"></option>`).join('');
+    }
+
+    function bindSkillsInputs() {
+      const addInput = document.getElementById('addSkillInput');
+      const addBtn   = document.getElementById('addSkillBtn');
+      const editInput= document.getElementById('editSkillInput');
+      const editBtn  = document.getElementById('editSkillBtn');
+
+      if (addBtn) addBtn.addEventListener('click', () => pushSkill(addInput, addFormSkills, 'addSkillsChips', true));
+      if (editBtn) editBtn.addEventListener('click', () => pushSkill(editInput, editFormSkills, 'editSkillsChips', true));
+
+      if (addInput) addInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); pushSkill(addInput, addFormSkills, 'addSkillsChips', true); }
+      });
+      if (editInput) editInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); pushSkill(editInput, editFormSkills, 'editSkillsChips', true); }
+      });
+    }
+
+    function bindSkillsMultiSelects() {
+      const addSel = document.getElementById('addSkillsSelect');
+      const editSel= document.getElementById('editSkillsSelect');
+      if (addSel) addSel.addEventListener('change', () => {
+        addFormSkills = uniqi([...Array.from(addSel.selectedOptions).map(o=>o.value), ...addFormSkills]);
+        renderSkillChips('addSkillsChips', addFormSkills, (skill) => removeSkill(skill, addFormSkills, 'addSkillsChips', addSel));
+      });
+      if (editSel) editSel.addEventListener('change', () => {
+        editFormSkills = uniqi([...Array.from(editSel.selectedOptions).map(o=>o.value), ...editFormSkills]);
+        renderSkillChips('editSkillsChips', editFormSkills, (skill) => removeSkill(skill, editFormSkills, 'editSkillsChips', editSel));
+      });
+    }
+
+    function removeSkill(skill, targetArr, chipsContainerId, selectEl) {
+      const idx = targetArr.findIndex(s => s.toLowerCase() === skill.toLowerCase());
+      if (idx >= 0) {
+        targetArr.splice(idx,1);
+        if (selectEl) {
+          Array.from(selectEl.options).forEach(o => {
+            if (o.value.toLowerCase() === skill.toLowerCase()) o.selected = false;
+          });
+        }
+        renderSkillChips(chipsContainerId, targetArr, (s) => removeSkill(s, targetArr, chipsContainerId, selectEl));
+      }
+    }
+
+    function pushSkill(inputEl, targetArr, chipsContainerId, addToOptions) {
+      const val = (inputEl?.value || '').trim();
+      if (!val) return;
+      if (!targetArr.some(s => s.toLowerCase() === val.toLowerCase())) {
+        targetArr.push(val);
+      }
+      inputEl.value = '';
+
+      if (addToOptions && !skillOptions.some(s => s.toLowerCase() === val.toLowerCase())) {
+        skillOptions.push(val);
+        skillOptions = uniqi(skillOptions).sort((a,b)=>a.localeCompare(b));
+        populateSkillsDatalist();
+        populateSkillsSelects();
+      }
+
+      renderSkillChips(chipsContainerId, targetArr, (skill) => removeSkill(skill, targetArr, chipsContainerId, null));
+    }
+
+    function renderSkillChips(containerId, arr, onRemove) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      el.innerHTML = '';
+      arr.forEach(skill => {
+        const chip = document.createElement('span');
+        chip.className = "inline-flex items-center gap-2 rounded-full bg-emerald-50 text-emerald-800 px-3 py-1 text-xs font-medium";
+        chip.innerHTML = `${escapeHtml(skill)} <button type="button" class="ml-1 text-emerald-700 hover:text-emerald-900" aria-label="Remove">&times;</button>`;
+        chip.querySelector('button').addEventListener('click', () => onRemove(skill));
+        el.appendChild(chip);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+    }
+
+    async function loadCurrentUser() {
+      try {
+        const response = await fetch('/api/auth/status', { credentials: 'include' });
+        const data = await response.json();
+        document.getElementById('currentUserName').textContent = data.isAuthenticated ? data.user.name : 'Not Authenticated';
+      } catch {
+        document.getElementById('currentUserName').textContent = 'Error Loading User';
+      }
+    }
+
+    async function logout() {
+      try {
+        const response = await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        if (response.ok) window.location.href = 'http://localhost:5173/login';
+        else alert('Error logging out');
+      } catch {
+        alert('Error logging out');
+      }
+    }
+
+    function loadCoursesTable() {
+      const tbody = document.getElementById('coursesTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (allCourses.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+              <div class="flex flex-col items-center gap-2">
+                <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <div class="text-lg font-medium text-gray-400">No courses yet</div>
+                <div class="text-sm text-gray-400">Create your first course to get started</div>
+              </div>
+            </td>
+          </tr>`;
+        return;
+      }
+
+      allCourses.forEach(course => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50';
+
+        const skills = Array.isArray(course.skills) ? course.skills : [];
+        const skillsPreview = skills.slice(0, 3);
+        const rest = skills.length - skillsPreview.length;
+
+        row.innerHTML = `
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <img src="${course.image || 'https://via.placeholder.com/48x48'}" alt="${escapeHtml(course.title)}" class="w-12 h-12 rounded-lg object-cover">
+              <div>
+                <div class="font-medium text-gray-900">${escapeHtml(course.title)}</div>
+                <div class="text-sm text-gray-500">${course.description ? escapeHtml(course.description.substring(0, 50)) + '...' : 'No description'}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-800">${escapeHtml(course.category || '-')}</span></td>
+          <td class="px-6 py-4"><span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-100 text-green-800">${escapeHtml(course.level || '-')}</span></td>
+          <td class="px-6 py-4 text-sm text-gray-900">${escapeHtml(course.instructor || '-')}</td>
+          <td class="px-6 py-4">
+            <div class="flex flex-wrap gap-1">
+              ${skillsPreview.map(s => `<span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium bg-emerald-50 text-emerald-700">${escapeHtml(s)}</span>`).join('')}
+              ${rest > 0 ? `<span class="text-[10px] text-gray-500">+${rest} more</span>` : ''}
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${course.status === 'published' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+              ${course.status === 'published' ? 'Published' : 'Draft'}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-2">
+              <button onclick="manageCourse('${course.id}')" class="p-2 text-gray-400 hover:text-lightblue hover:bg-lightblue/10 rounded-lg transition-colors" title="Manage Lesson">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              </button>
+
+              <button onclick="viewCourse('${course.id}')" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="View Details">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+              </button>
+              <button onclick="editCourse('${course.id}')" class="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors" title="Edit Course">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+              </button>
+              <button onclick="toggleCourseStatus('${course.id}', '${course.status}')" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Toggle Status">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
+              </button>
+              <button onclick="deleteCourse('${course.id}')" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Course">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function openAddCourseModal() {
+      addFormSkills = [];
+      renderSkillChips('addSkillsChips', addFormSkills, ()=>{});
+      document.getElementById('courseCategoryNew').value = '';
+      document.getElementById('addCourseModal').classList.remove('hidden');
+    }
+    function closeAddCourseModal() {
+      document.getElementById('addCourseModal').classList.add('hidden');
+      document.getElementById('addCourseForm').reset();
+      addFormSkills = [];
+      renderSkillChips('addSkillsChips', addFormSkills, ()=>{});
+      const addSel = document.getElementById('addSkillsSelect');
+      if (addSel) Array.from(addSel.options).forEach(o => (o.selected = false));
+    }
+    function openEditCourseModal() { document.getElementById('editCourseModal').classList.remove('hidden'); }
+    function closeEditCourseModal() {
+      document.getElementById('editCourseModal').classList.add('hidden');
+      document.getElementById('editCourseForm').reset();
+      editFormSkills = [];
+      renderSkillChips('editSkillsChips', editFormSkills, ()=>{});
+      document.getElementById('editCourseCategoryNew').value = '';
+      const editSel = document.getElementById('editSkillsSelect');
+      if (editSel) Array.from(editSel.options).forEach(o => (o.selected = false));
+    }
+
+    function togglePriceField() {
+      const isFree = document.getElementById('courseFree').checked;
+      const priceField = document.getElementById('priceField');
+      const priceInput = document.getElementById('coursePrice');
+      if (isFree) { priceField.classList.add('hidden'); priceInput.value = ''; priceInput.required = false; }
+      else { priceField.classList.remove('hidden'); priceInput.required = true; }
+    }
+    function toggleEditPriceField() {
+      const isFree = document.getElementById('editCourseFree').checked;
+      const priceField = document.getElementById('editPriceField');
+      const priceInput = document.getElementById('editCoursePrice');
+      if (isFree) { priceField.classList.add('hidden'); priceInput.value = ''; priceInput.required = false; }
+      else { priceField.classList.remove('hidden'); priceInput.required = true; }
+    }
+
+    // === Add Course submit (adds category to options if new, and remembers new skills) ===
+    document.getElementById('addCourseForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const imageInput = document.getElementById('courseImageFile');
+      const imageFile = imageInput.files[0];
+
+      const go = (img) => {
+        const selectedCategory = document.getElementById('courseCategorySelect').value;
+        const customCategory = (document.getElementById('courseCategoryNew').value || '').trim();
+        const finalCategory = customCategory || selectedCategory;
+        if (!finalCategory) { alert('Please select or add a category.'); return; }
+
+        // Immediately add new category to dropdown for subsequent use
+        if (customCategory && !categoryOptions.some(c => c.toLowerCase() === customCategory.toLowerCase())) {
+          categoryOptions.push(customCategory);
+          categoryOptions = uniqi(categoryOptions).sort((a,b)=>a.localeCompare(b));
+          populateCategorySelects();
+        }
+
+        // Merge multi-select selected skills into chips list before submit
+        const addSel = document.getElementById('addSkillsSelect');
+        if (addSel) {
+          const selected = Array.from(addSel.selectedOptions).map(o => o.value);
+          addFormSkills = uniqi([...addFormSkills, ...selected]);
+        }
+
+        // Add any brand-new skills into global options (so they appear in options next time)
+        addFormSkills.forEach(s => {
+          if (!skillOptions.some(x => x.toLowerCase() === s.toLowerCase())) {
+            skillOptions.push(s);
+          }
+        });
+        skillOptions = uniqi(skillOptions).sort((a,b)=>a.localeCompare(b));
+        populateSkillsDatalist();
+        populateSkillsSelects();
+
+        const courseData = {
+          title: document.getElementById('courseTitle').value,
+          description: document.getElementById('courseDescription').value,
+          level: document.getElementById('courseLevel').value,
+          category: finalCategory,
+          instructor: document.getElementById('courseInstructor').value,
+          image: img || undefined,
+          hours: document.getElementById('courseHours').value || undefined,
+          certificate: document.getElementById('courseCertificate').checked,
+          price: document.getElementById('courseFree').checked ? 0 : (document.getElementById('coursePrice').value || 0),
+          skills: addFormSkills.slice(),
+        };
+
+        createCourse(courseData, finalCategory);
+      };
+
+      if (imageFile) {
+        if (!imageFile.type || !imageFile.type.startsWith(ALLOWED_IMAGE_PREFIX)) { alert('Please select a valid image file.'); return; }
+        if (imageFile.size > MAX_IMAGE_BYTES) { alert('The image exceeds the 2MB limit.'); return; }
+        const reader = new FileReader();
+        reader.onload = (ev) => go(ev.target.result);
+        reader.onerror = () => alert('Unable to read the image file.');
+        reader.readAsDataURL(imageFile);
+      } else {
+        go(undefined);
+      }
+    });
+
+    async function createCourse(courseData, finalCategory) {
+      try {
+        const res = await fetch('/api/courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify(courseData)
+        });
+
+        if (!res.ok) {
+          let message = res.statusText || 'Upload failed';
+          try {
+            const ct = res.headers.get('content-type') || '';
+            if (ct.includes('application/json')) {
+              const data = await res.json();
+              message = data?.message || message;
+            } else {
+              const text = await res.text();
+              if (text) message = text;
+            }
+          } catch {}
+          if (res.status === 413) message = 'The image is too large (max 2MB).';
+          alert('Error creating course: ' + message);
+          return;
+        }
+
+        const result = await res.json();
+        allCourses.push(result.course);
+
+        // Ensure the just-used category is in options (handles backend-normalized case)
+        if (finalCategory && !categoryOptions.some(c => c.toLowerCase() === String(finalCategory).toLowerCase())) {
+          categoryOptions.push(finalCategory);
+        }
+        // Ensure saved skills are remembered globally
+        (result.course?.skills || []).forEach(s => {
+          if (!skillOptions.some(x => x.toLowerCase() === String(s).toLowerCase())) skillOptions.push(String(s));
+        });
+
+        categoryOptions = uniqi(categoryOptions).sort((a,b)=>a.localeCompare(b));
+        skillOptions = uniqi(skillOptions).sort((a,b)=>a.localeCompare(b));
+        populateCategorySelects();
+        populateSkillsDatalist();
+        populateSkillsSelects();
+
+        loadCoursesTable();
+        closeAddCourseModal();
+        alert('Course created successfully!');
+      } catch {
+        alert('Error creating course. Please check your connection and try again.');
+      }
+    }
+
+    function editCourse(courseId) {
+      const course = allCourses.find(c => c.id === courseId);
+      if (!course) return;
+
+      document.getElementById('editCourseId').value = course.id;
+      document.getElementById('editCourseTitle').value = course.title || '';
+      document.getElementById('editCourseDescription').value = course.description || '';
+      document.getElementById('editCourseLevel').value = course.level || '';
+      document.getElementById('editCourseInstructor').value = course.instructor || '';
+
+      // Category select + custom
+      if (course.category && !categoryOptions.some(c => c.toLowerCase() === course.category.toLowerCase())) {
+        categoryOptions.push(course.category);
+        categoryOptions = uniqi(categoryOptions).sort((a,b)=>a.localeCompare(b));
+        populateCategorySelects();
+      }
+      document.getElementById('editCourseCategorySelect').value = course.category || '';
+      document.getElementById('editCourseCategoryNew').value = '';
+
+      // Skills (chips + multi-select preselect)
+      if (Array.isArray(course.skills)) {
+        editFormSkills = course.skills.slice();
+      } else {
+        editFormSkills = [];
+      }
+      // add missing skills to global options
+      editFormSkills.forEach(s => {
+        if (!skillOptions.some(x => x.toLowerCase() === s.toLowerCase())) skillOptions.push(s);
+      });
+      skillOptions = uniqi(skillOptions).sort((a,b)=>a.localeCompare(b));
+      populateSkillsSelects();
+
+      const editSel = document.getElementById('editSkillsSelect');
+      if (editSel) Array.from(editSel.options).forEach(o => (o.selected = editFormSkills.some(s => s.toLowerCase() === o.value.toLowerCase())));
+      renderSkillChips('editSkillsChips', editFormSkills, (skill) => removeSkill(skill, editFormSkills, 'editSkillsChips', editSel));
+
+      document.getElementById('editCourseHours').value = course.hours || '';
+      document.getElementById('editCourseCertificate').checked = !!course.certificate;
+      const isFree = !course.price || Number(course.price) === 0;
+      document.getElementById('editCourseFree').checked = isFree;
+      if (isFree) { document.getElementById('editPriceField').classList.add('hidden'); document.getElementById('editCoursePrice').value = ''; }
+      else { document.getElementById('editPriceField').classList.remove('hidden'); document.getElementById('editCoursePrice').value = Number(course.price) || 0; }
+
+      openEditCourseModal();
+    }
+
+    document.getElementById('editCourseForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const courseId = document.getElementById('editCourseId').value;
+      const imageInput = document.getElementById('editCourseImageFile');
+      const imageFile = imageInput.files[0];
+
+      const sendUpdate = async (imgData) => {
+        const selectedCategory = document.getElementById('editCourseCategorySelect').value;
+        const customCategory = (document.getElementById('editCourseCategoryNew').value || '').trim();
+        const finalCategory = customCategory || selectedCategory;
+        if (!finalCategory) { alert('Please select or add a category.'); return; }
+
+        if (customCategory && !categoryOptions.some(c => c.toLowerCase() === customCategory.toLowerCase())) {
+          categoryOptions.push(customCategory);
+          categoryOptions = uniqi(categoryOptions).sort((a,b)=>a.localeCompare(b));
+          populateCategorySelects();
+        }
+
+        // Merge multi-select selected skills into chips list before submit
+        const editSel = document.getElementById('editSkillsSelect');
+        if (editSel) {
+          const selected = Array.from(editSel.selectedOptions).map(o => o.value);
+          editFormSkills = uniqi([...editFormSkills, ...selected]);
+        }
+
+        // Add any new skills into global options
+        editFormSkills.forEach(s => {
+          if (!skillOptions.some(x => x.toLowerCase() === s.toLowerCase())) skillOptions.push(s);
+        });
+        skillOptions = uniqi(skillOptions).sort((a,b)=>a.localeCompare(b));
+        populateSkillsDatalist();
+        populateSkillsSelects();
+
+        const payload = {
+          title: document.getElementById('editCourseTitle').value,
+          description: document.getElementById('editCourseDescription').value,
+          level: document.getElementById('editCourseLevel').value,
+          category: finalCategory,
+          instructor: document.getElementById('editCourseInstructor').value,
+          hours: document.getElementById('editCourseHours').value || undefined,
+          certificate: document.getElementById('editCourseCertificate').checked,
+          price: document.getElementById('editCourseFree').checked ? 0 : (document.getElementById('editCoursePrice').value || 0),
+          skills: editFormSkills.slice(),
+        };
+        if (imgData) payload.image = imgData;
+
+        try {
+          const res = await fetch(`/api/courses/${courseId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) {
+            let msg = res.statusText || 'Update failed';
+            try {
+              const ct = res.headers.get('content-type') || '';
+              if (ct.includes('application/json')) {
+                const data = await res.json();
+                msg = data?.message || msg;
+              } else {
+                const t = await res.text();
+                if (t) msg = t;
+              }
+            } catch {}
+            alert('Error updating course: ' + msg);
+            return;
+          }
+
+          const idx = allCourses.findIndex(c => c.id === courseId);
+          if (idx >= 0) allCourses[idx] = { ...allCourses[idx], ...payload };
+
+          bootstrapCategoryAndSkills();
+          populateCategorySelects();
+          populateSkillsDatalist();
+          populateSkillsSelects();
+          loadCoursesTable();
+          closeEditCourseModal();
+          alert('Course updated successfully!');
+        } catch {
+          alert('Network error while updating course.');
+        }
+      };
+
+      if (imageFile) {
+        if (!imageFile.type || !imageFile.type.startsWith(ALLOWED_IMAGE_PREFIX)) { alert('Please select a valid image file.'); return; }
+        if (imageFile.size > MAX_IMAGE_BYTES) { alert('The image exceeds the 2MB limit.'); return; }
+        const reader = new FileReader();
+        reader.onload = (ev) => sendUpdate(ev.target.result);
+        reader.onerror = () => alert('Unable to read the image file.');
+        reader.readAsDataURL(imageFile);
+      } else {
+        await sendUpdate(undefined);
+      }
+    });
+
+    function viewCourse(courseId) {
+      const course = allCourses.find(c => c.id === courseId);
+      if (!course) return;
+      const skills = Array.isArray(course.skills) ? course.skills.join(', ') : '-';
+      alert(`Course Details:
+Title: ${course.title}
+Description: ${course.description}
+Level: ${course.level}
+Category: ${course.category}
+Instructor: ${course.instructor}
+Skills: ${skills}
+Status: ${course.status}`);
+    }
+
+
+    function manageCourse(courseId) {
+      // Navigate to the course management page
+      window.location.href = `/manage-course/${courseId}`;
+    }
+
+    async function toggleCourseStatus(courseId, currentStatus) {
+      const newStatus = currentStatus === 'published' ? 'draft' : 'published';
+      if (!confirm(`Are you sure you want to change the course status to ${newStatus}?`)) return;
+
+      try {
+        const response = await fetch(`/api/courses/${courseId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: newStatus })
+        });
+
+        if (response.ok) {
+          const course = allCourses.find(c => c.id === courseId);
+          if (course) {
+            course.status = newStatus;
+            loadCoursesTable();
+            alert(`Course status updated to ${newStatus} successfully!`);
+          }
+        } else {
+          const error = await response.json();
+          alert('Error updating course status: ' + error.message);
+        }
+      } catch {
+        alert('Error updating course status');
+      }
+    }
+
+    async function deleteCourse(courseId) {
+      if (!confirm('Are you sure you want to delete this course?')) return;
+
+      try {
+        const response = await fetch(`/api/courses/${courseId}`, { 
+          method: 'DELETE',
+          credentials: 'include'
+        });
+        if (response.ok) {
+          allCourses = allCourses.filter(c => c.id !== courseId);
+          bootstrapCategoryAndSkills();
+          populateCategorySelects();
+          populateSkillsDatalist();
+          populateSkillsSelects();
+          loadCoursesTable();
+          alert('Course deleted successfully!');
+        } else {
+          const error = await response.json();
+          alert('Error deleting course: ' + error.message);
+        }
+      } catch {
+        alert('Error deleting course');
+      }
+    }
+
+// === Random default skills for brand-new categories ===
+const RANDOM_SKILLS_POOL = [
+  "Problem Solving","Critical Thinking","Communication","Teamwork","Project Planning","Time Management","Negotiation",
+  "Leadership","Stakeholder Management","Risk Assessment","Data Analysis","Business Writing","Presentation",
+  "Customer Empathy","Market Research","Brand Strategy","Copywriting","SEO","SEM","Email Campaigns","A/B Testing",
+  "Analytics","Dashboarding","KPI Tracking","Funnel Optimization","Content Strategy","Social Media",
+  "UI/UX Basics","Wireframing","Prototyping","Accessibility (a11y)","Responsive Design","Design Systems",
+  "JavaScript","TypeScript","Node.js","React","APIs","REST","GraphQL","Git & GitHub","Testing (Jest)",
+  "CI/CD","Docker","Kubernetes","Cloud Basics","Security Basics","DevOps","Linux Fundamentals",
+  "Databases","SQL","NoSQL","Caching","Performance Tuning","Error Handling","Observability",
+  "Agile","Scrum","Kanban","Backlog Grooming","Sprint Planning","Retrospectives","Documentation",
+  "Finance Basics","Budgeting","Forecasting","Pricing Strategy","Go-To-Market","Sales Fundamentals",
+  "Customer Success","Support Workflows","Onboarding","Churn Analysis","NPS/CSAT",
+  "First Aid","CPR","Anatomy Basics","Physiology","Medical Terminology","Patient Communication",
+  "Clinical Documentation","Infection Control","EHR Basics","Health Data Privacy","Quality & Safety",
+  "Wellness Coaching","Stress Management","Mindfulness","Nutrition Basics","Fitness Assessment"
+];
+
+function pickRandomSkills(pool, n = 24) {
+  const copy = pool.slice();
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, Math.min(n, copy.length));
+}
+function ensureCategorySkills(cat) {
+  const key = String(cat || "").trim();
+  if (!key) return;
+  if (!categorySkillsMap[key]) {
+    categorySkillsMap[key] = pickRandomSkills(RANDOM_SKILLS_POOL, 24);
+  }
+}
+
+// === Static skills per category (expanded & includes Health) ===
+const categorySkillsMap = {
+  Business: [
+    "Leadership","Negotiation","Finance Basics","Entrepreneurship","Communication",
+    "Marketing Strategy","Team Management","Decision Making","Business Planning","Problem Solving",
+    "Sales Fundamentals","Customer Success","Pricing Strategy","Business Analytics","OKRs",
+    "Change Management","Business Ethics","Operational Excellence","Process Mapping","Forecasting"
+  ],
+  Marketing: [
+    "SEO","Copywriting","Social Media Ads","Branding","Content Marketing",
+    "Analytics","Email Campaigns","Video Marketing","Influencer Marketing","Market Research",
+    "Google Ads","Meta Ads","A/B Testing","Funnel Optimization","PR Outreach",
+    "Community Management","Landing Page CRO","Keyword Research","CRM Basics","Marketing Automation"
+  ],
+  Technology: [
+    "JavaScript","Node.js","React","Cybersecurity","Databases",
+    "Cloud Computing","DevOps","Docker","APIs","AI/ML",
+    "TypeScript","Git & GitHub","RESTful Design","GraphQL","CI/CD",
+    "Kubernetes","Linux Fundamentals","Testing (Jest)","Microservices","NoSQL"
+  ],
+  Design: [
+    "UI/UX","Figma","Typography","Color Theory","Wireframing",
+    "Prototyping","Brand Identity","Logo Design","Illustration","Animation",
+    "Design Systems","Accessibility (a11y)","Responsive Design","User Research","Usability Testing",
+    "Motion Design","Iconography","Layout & Grids","Interaction Design","Visual Hierarchy"
+  ],
+  Management: [
+    "Agile","Scrum","Project Planning","Risk Management","Resource Allocation",
+    "Time Management","Stakeholder Communication","Leadership","KPIs","Conflict Resolution",
+    "Roadmapping","Budgeting","Meeting Facilitation","Hiring & Onboarding","Performance Reviews",
+    "Delegation","OKR Management","Retrospectives","Decision Frameworks","Vendor Management"
+  ],
+  Health: [
+    "First Aid","CPR","Anatomy Basics","Physiology","Medical Terminology",
+    "Patient Communication","Clinical Documentation","Vital Signs Monitoring","Infection Control","Sterilization",
+    "Nutrition Basics","Public Health","Health Promotion","Mental Health Awareness","Epidemiology Basics",
+    "Pharmacology Basics","Wound Care","Triage","Telemedicine Basics","Electronic Health Records (EHR)",
+    "HIPAA Fundamentals","Health Data Privacy","Blood Pressure Measurement","Glucose Monitoring","Medication Administration",
+    "Vaccination Handling","Emergency Response","Community Health","Health Coaching","Wellness Planning",
+    "Rehabilitation Basics","Physiotherapy Basics","Ergonomics","Sports Injury Prevention","Prenatal Care Basics",
+    "Pediatric Care Basics","Elderly Care","Home Care Skills","Caregiving","Stress Management",
+    "Mindfulness for Health","Fitness Assessment","First Responder Coordination","Medical Ethics","Quality & Safety in Healthcare",
+    "Clinical Research Basics","Biostatistics Basics","Laboratory Safety","Specimen Collection","Basic Life Support (BLS)"
+  ]
+};
+
+// Adjust bootstrapCategoryAndSkills to also set skillOptions based on category
+function bootstrapCategoryAndSkills(selectedCategory) {
+const base = ["Business","Marketing","Technology","Design","Management","Health"];
+  const fromCourses = (allCourses || []).map(c => c?.category).filter(Boolean);
+  categoryOptions = uniqi([...base, ...fromCourses]).sort((a,b)=>a.localeCompare(b));
+
+  if (selectedCategory && categorySkillsMap[selectedCategory]) {
+    skillOptions = uniqi(categorySkillsMap[selectedCategory]).sort((a,b)=>a.localeCompare(b));
+  } else if (selectedCategory) {
+    // If it's a new category, start empty until user adds new skills
+    skillOptions = [];
+  } else {
+    // No category selected yet -> no skills shown
+    skillOptions = [];
+  }
+}
+
+// Clear skills on load
+document.addEventListener("DOMContentLoaded", () => {
+  skillOptions = [];
+  populateSkillsSelects();
+  populateSkillsDatalist();
+  
+  // Check if we should auto-open the add content modal
+  if (window.location.hash === '#openAddContent') {
+    // Wait a bit for all scripts to load, then open the modal
+    setTimeout(() => {
+      if (typeof window.openAddContentModal === 'function') {
+        console.log('Auto-opening add content modal from hash');
+        window.openAddContentModal();
+        // Remove the hash from URL
+        window.history.replaceState(null, null, window.location.pathname);
+      }
+    }, 500);
+  }
+});
+
+// Listen to category changes and reload skills (hard-reset selections for Add form)
+const addCategorySelectEl = document.getElementById("courseCategorySelect");
+if (addCategorySelectEl) {
+  addCategorySelectEl.addEventListener("change", (e) => {
+    const selectedCategory = e.target.value;
+
+    // Reset selected skills
+    addFormSkills = [];
+    renderSkillChips("addSkillsChips", addFormSkills, ()=>{});
+    const addSel = document.getElementById("addSkillsSelect");
+    if (addSel) Array.from(addSel.options).forEach(o => (o.selected = false));
+
+    // Rebuild skills
+    bootstrapCategoryAndSkills(selectedCategory);
+    populateSkillsSelects();
+    populateSkillsDatalist();
+  });
+}
+
+function debounce(fn, ms = 250) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+
+const manualCatInput = document.getElementById("courseCategoryNew");
+if (manualCatInput) {
+  const onManualCategoryChange = debounce(() => {
+    const typed = (manualCatInput.value || "").trim();
+
+    // reset current selections & chips
+    addFormSkills = [];
+    renderSkillChips("addSkillsChips", addFormSkills, ()=>{});
+    const addSel = document.getElementById("addSkillsSelect");
+    if (addSel) Array.from(addSel.options).forEach(o => (o.selected = false));
+
+    if (typed.length === 0) {
+      // empty manual field -> keep skills empty until user selects a category
+      skillOptions = [];
+      populateSkillsSelects();
+      populateSkillsDatalist();
+      return;
+    }
+
+    // generate/cached random static set for this brand-new category
+    ensureCategorySkills(typed); // fills categorySkillsMap[typed] with random 24 if not present
+
+    // use ONLY the generated static set for this typed category
+    skillOptions = uniqi(categorySkillsMap[typed]).sort((a,b)=>a.localeCompare(b));
+
+    // re-render the skills UI
+    populateSkillsSelects();
+    populateSkillsDatalist();
+  }, 250);
+
+  // fire on typing and when the field loses focus
+  manualCatInput.addEventListener("input", onManualCategoryChange);
+  manualCatInput.addEventListener("change", onManualCategoryChange);
+}
+
+
+
+
+  // Shows course details in the view modal. Uses existing `allCourses` and `escapeHtml`.
+  // Called from table: viewCourse('<id>')
+  function viewCourse(courseId) {
+    if (!courseId) return;
+
+    const course = (allCourses || []).find(c => String(c.id) === String(courseId));
+    if (!course) {
+      alert('Course not found.');
+      return;
+    }
+
+    // Image
+    const imgEl = document.getElementById('viewCourseImage');
+    if (imgEl) imgEl.src = course.image || 'https://via.placeholder.com/96x96';
+
+    // Title & meta
+    const titleEl = document.getElementById('viewCourseTitle');
+    if (titleEl) titleEl.innerHTML = escapeHtml(course.title || 'Untitled');
+
+    const metaEl = document.getElementById('viewCourseMeta');
+    if (metaEl) {
+      const cat = course.category ? escapeHtml(course.category) : '-';
+      const level = course.level ? escapeHtml(course.level) : '-';
+      metaEl.textContent = `${cat} • ${level}`;
+    }
+
+    // Description
+    const descEl = document.getElementById('viewCourseDescription');
+    if (descEl) descEl.innerHTML = escapeHtml(course.description || 'No description provided.');
+
+    // Category, Level, Instructor, Hours
+    const catEl = document.getElementById('viewCourseCategory');
+    if (catEl) catEl.innerHTML = escapeHtml(course.category || '-');
+
+    const levelEl = document.getElementById('viewCourseLevel');
+    if (levelEl) levelEl.innerHTML = escapeHtml(course.level || '-');
+
+    const instrEl = document.getElementById('viewCourseInstructor');
+    if (instrEl) instrEl.innerHTML = escapeHtml(course.instructor || '-');
+
+    const hoursEl = document.getElementById('viewCourseHours');
+    if (hoursEl) hoursEl.innerHTML = (course.hours || course.hours === 0) ? escapeHtml(String(course.hours)) : '-';
+
+    // Skills
+    const skillsEl = document.getElementById('viewCourseSkills');
+    if (skillsEl) {
+      skillsEl.innerHTML = '';
+      const skills = Array.isArray(course.skills) ? course.skills : [];
+      if (skills.length === 0) {
+        skillsEl.innerHTML = '<span class="text-sm text-gray-500">No skills listed.</span>';
+      } else {
+        skills.forEach(s => {
+          const span = document.createElement('span');
+          span.className = "inline-flex items-center rounded-full px-2 py-0.5 text-[12px] font-medium bg-emerald-50 text-emerald-700";
+          span.innerHTML = escapeHtml(s);
+          skillsEl.appendChild(span);
+        });
+      }
+    }
+
+    // Price
+    const priceEl = document.getElementById('viewCoursePrice');
+    if (priceEl) {
+      const p = (course.price === 0 || course.price === '0' || Number(course.price) === 0) ? 'Free' : (course.price ? `$${String(course.price)}` : '-');
+      priceEl.innerHTML = escapeHtml(p);
+    }
+
+    // Certificate
+    const certEl = document.getElementById('viewCourseCertificate');
+    if (certEl) certEl.innerHTML = course.certificate ? 'Yes' : 'No';
+
+    // Status
+    const statusEl = document.getElementById('viewCourseStatus');
+    if (statusEl) statusEl.innerHTML = escapeHtml(course.status ? (course.status === 'published' ? 'Published' : course.status) : '-');
+
+    // Open modal
+    openViewCourseModal();
+  }
+
+  function openViewCourseModal() {
+    const modal = document.getElementById('viewCourseModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.setAttribute('aria-hidden', 'false');
+
+    // close on overlay click (but not when clicking inside card)
+    const card = document.getElementById('viewCourseModalCard');
+    const onClick = (ev) => {
+      if (!card) return;
+      if (!card.contains(ev.target)) closeViewCourseModal();
+    };
+    modal._overlayHandler = onClick;
+    modal.addEventListener('click', onClick);
+
+    // close on Escape
+    const onKey = (ev) => { if (ev.key === 'Escape') closeViewCourseModal(); };
+    modal._keyHandler = onKey;
+    document.addEventListener('keydown', onKey);
+  }
+
+  function closeViewCourseModal() {
+    const modal = document.getElementById('viewCourseModal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.setAttribute('aria-hidden', 'true');
+
+    if (modal._overlayHandler) {
+      modal.removeEventListener('click', modal._overlayHandler);
+      modal._overlayHandler = null;
+    }
+    if (modal._keyHandler) {
+      document.removeEventListener('keydown', modal._keyHandler);
+      modal._keyHandler = null;
+    }
+  }
+
+  </script>
+
+<!-- Add Content Modal and Functions (from navbar) -->
+<script>
+  // Define openAddContentModal function for courses page
+  if (!window._openAddContentModalReal) {
+    window._openAddContentModalReal = async function openAddContentModal() {
+      try {
+        console.log('openAddContentModal called from courses page');
+        const modal = document.getElementById('addContentModal');
+        if (!modal) {
+          console.error('addContentModal element not found!');
+          alert('Modal not found. Please refresh the page.');
+          return;
+        }
+        
+        // Load courses
+        const response = await fetch('/api/courses', { credentials: 'include' });
+        const courses = await response.ok ? await response.json() : [];
+        
+        console.log('Courses loaded:', courses.length);
+        
+        const courseSelect = document.getElementById('addContentCourseSelect');
+        if (courseSelect) {
+          courseSelect.innerHTML = '<option value="">Select a course...</option>' + 
+            courses.map(c => `<option value="${c.id}">${c.title || c.id}</option>`).join('');
+        } else {
+          console.error('addContentCourseSelect element not found!');
+        }
+        
+        modal.classList.remove('hidden');
+        console.log('Modal should now be visible');
+      } catch (error) {
+        console.error('Error loading courses:', error);
+        alert('Error loading courses: ' + error.message);
+      }
+    };
+  }
+
+  // Also assign to the main function name
+  window.openAddContentModal = window._openAddContentModalReal;
+
+  if (!window.closeAddContentModal) {
+    window.closeAddContentModal = function closeAddContentModal() {
+      const modal = document.getElementById('addContentModal');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+      const typeSelect = document.getElementById('addContentTypeSelect');
+      const courseSelect = document.getElementById('addContentCourseSelect');
+      const lessonSelect = document.getElementById('addContentLessonSelect');
+      if (typeSelect) typeSelect.value = '';
+      if (courseSelect) courseSelect.value = '';
+      if (lessonSelect) {
+        lessonSelect.innerHTML = '<option value="">Select a lesson...</option>';
+        lessonSelect.disabled = true;
+      }
+    }
+  }
+
+  if (!window.onAddContentTypeChange) {
+    window.onAddContentTypeChange = async function onAddContentTypeChange() {
+      const type = document.getElementById('addContentTypeSelect')?.value;
+      const lessonSelect = document.getElementById('addContentLessonSelect');
+      const courseId = document.getElementById('addContentCourseSelect')?.value;
+      
+      if (!lessonSelect) return;
+      
+      if (type === 'lesson') {
+        lessonSelect.disabled = true;
+        lessonSelect.innerHTML = '<option value="">Not required for lessons</option>';
+      } else if (type === 'chapter' || type === 'quiz') {
+        if (!courseId) {
+          alert('Please select a course first');
+          document.getElementById('addContentTypeSelect').value = '';
+          return;
+        }
+        lessonSelect.disabled = false;
+        await loadLessonsForCourse(courseId);
+      }
+    }
+  }
+
+  if (!window.onAddContentCourseChange) {
+    window.onAddContentCourseChange = async function onAddContentCourseChange() {
+      const courseId = document.getElementById('addContentCourseSelect')?.value;
+      const type = document.getElementById('addContentTypeSelect')?.value;
+      const lessonSelect = document.getElementById('addContentLessonSelect');
+      
+      if (!lessonSelect) return;
+      
+      if (type === 'chapter' || type === 'quiz') {
+        if (courseId) {
+          lessonSelect.disabled = false;
+          await loadLessonsForCourse(courseId);
+        } else {
+          lessonSelect.disabled = true;
+          lessonSelect.innerHTML = '<option value="">Select a lesson...</option>';
+        }
+      }
+    }
+  }
+
+  async function loadLessonsForCourse(courseId) {
+    try {
+      const response = await fetch(`/api/lessons/course/${courseId}`, { credentials: 'include' });
+      const lessons = await response.ok ? await response.json() : [];
+      const lessonSelect = document.getElementById('addContentLessonSelect');
+      if (lessonSelect) {
+        lessonSelect.innerHTML = '<option value="">Select a lesson...</option>' + 
+          lessons.map(l => `<option value="${l.id}">${l.title || l.id}</option>`).join('');
+      }
+    } catch (error) {
+      console.error('Error loading lessons:', error);
+      const lessonSelect = document.getElementById('addContentLessonSelect');
+      if (lessonSelect) {
+        lessonSelect.innerHTML = '<option value="">Error loading lessons</option>';
+      }
+    }
+  }
+
+  if (!window.proceedToAddContent) {
+    window.proceedToAddContent = function proceedToAddContent() {
+      const courseId = document.getElementById('addContentCourseSelect')?.value;
+      const type = document.getElementById('addContentTypeSelect')?.value;
+      const lessonId = document.getElementById('addContentLessonSelect')?.value;
+      
+      if (!courseId) {
+        alert('Please select a course');
+        return;
+      }
+      
+      if (!type) {
+        alert('Please select content type');
+        return;
+      }
+      
+      if ((type === 'chapter' || type === 'quiz') && !lessonId) {
+        alert('Please select a lesson');
+        return;
+      }
+      
+      closeAddContentModal();
+      
+      // Navigate based on type
+      if (type === 'lesson') {
+        window.location.href = `/manage-course/${courseId}`;
+      } else if (type === 'chapter') {
+        window.location.href = `/manage-lesson/${lessonId}?action=addChapter`;
+      } else if (type === 'quiz') {
+        window.location.href = `/manage-lesson/${lessonId}?action=addQuiz`;
+      }
+    }
+  }
+</script>
+
+<!-- Add Content Modal -->
+<div id="addContentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-semibold text-gray-900">Add Content to Course</h3>
+      <button onclick="closeAddContentModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Select Course</label>
+        <select id="addContentCourseSelect" onchange="onAddContentCourseChange()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Loading courses...</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Content Type</label>
+        <select id="addContentTypeSelect" onchange="onAddContentTypeChange()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Select type...</option>
+          <option value="lesson">📖 Lesson</option>
+          <option value="chapter">📚 Chapter</option>
+          <option value="quiz">🧩 Quiz</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Select Lesson <span class="text-gray-500 text-xs">(required for chapters/quizzes)</span></label>
+        <select id="addContentLessonSelect" disabled class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-100">
+          <option value="">Select a lesson...</option>
+        </select>
+      </div>
+      <div class="flex justify-end gap-3 pt-4">
+        <button type="button" onclick="closeAddContentModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+        <button type="button" onclick="proceedToAddContent()" class="px-4 py-2 bg-[#4DA3FF] hover:bg-[#3B8BCC] text-white rounded-lg transition-colors">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

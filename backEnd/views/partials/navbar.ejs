@@ -1,0 +1,498 @@
+<!-- Topbar -->
+<header class="h-14 border-b border-black/5 bg-white flex items-center justify-between px-4">
+  <div class="flex items-center gap-3">
+    <%- typeof backButton !== 'undefined' && backButton ? `
+      <a href="${backButton.href || 'javascript:history.back()'}" class="text-gray-500 hover:text-gray-700">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      </a>
+    ` : '' %>
+    <h1 class="text-lg font-semibold text-gray-900"><%= title || 'Admin Dashboard' %></h1>
+  </div>
+  <div class="flex items-center gap-3">
+    <%- typeof actionButton !== 'undefined' && actionButton ? `
+      <button onclick="${actionButton.onclick}" class="px-3 py-1.5 text-sm font-semibold text-lightblue hover:bg-lightblue/10 rounded-lg transition-colors">
+        ${actionButton.text}
+      </button>
+    ` : '' %>
+    <!-- Notifications -->
+    <div class="relative">
+      <button id="notificationBtn" class="grid place-items-center h-9 w-9 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+        🔔
+        <span id="notificationBadgeTop" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+      </button>
+
+      <!-- Notification dropdown -->
+      <div id="notificationDropdown" class="hidden absolute right-0 top-12 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div class="p-3 border-b border-gray-200">
+          <h3 class="font-semibold text-gray-900">Notifications</h3>
+        </div>
+        <div id="notificationList" class="max-h-64 overflow-y-auto">
+          <div class="p-3 text-center text-gray-500">
+            Loading notifications...
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-sm text-gray-600">Welcome,</span>
+      <span id="currentUserName" class="text-sm font-semibold text-gray-900">Admin</span>
+    </div>
+    <button onclick="logout()" class="px-3 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-lg transition-colors">Logout</button>
+  </div>
+</header>
+<script>
+  // Define openAddContentModal early so it's available when sidebar loads
+  window._openAddContentModalReal = async function openAddContentModal() {
+    try {
+      console.log('openAddContentModal called');
+      const modal = document.getElementById('addContentModal');
+      if (!modal) {
+        console.error('addContentModal element not found!');
+        alert('Modal not found. Please refresh the page.');
+        return;
+      }
+      
+      // Load courses
+      const response = await fetch('/api/courses', { credentials: 'include' });
+      const courses = await response.ok ? await response.json() : [];
+      
+      console.log('Courses loaded:', courses.length);
+      
+      const courseSelect = document.getElementById('addContentCourseSelect');
+      if (courseSelect) {
+        courseSelect.innerHTML = '<option value="">Select a course...</option>' + 
+          courses.map(c => `<option value="${c.id}">${c.title || c.id}</option>`).join('');
+      } else {
+        console.error('addContentCourseSelect element not found!');
+      }
+      
+      modal.classList.remove('hidden');
+      console.log('Modal should now be visible');
+    } catch (error) {
+      console.error('Error loading courses:', error);
+      alert('Error loading courses: ' + error.message);
+    }
+  };
+
+  (async function(){
+    try{
+      const res = await fetch('/api/auth/status', { credentials: 'include' });
+      const data = await res.json();
+      if (data?.isAuthenticated && data.user) {
+        const el = document.getElementById('currentUserName');
+        if (el) el.textContent = data.user.name || 'Admin';
+        
+        // Load notifications if user is admin
+        if (data.user.role === 'Admin' || data.user.role === 'admin') {
+          loadNotifications();
+        }
+      }
+    }catch(e){}
+  })();
+  
+  // Get read notifications from localStorage
+  function getReadNotifications() {
+    try {
+      const read = localStorage.getItem('readNotifications');
+      return read ? JSON.parse(read) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  
+  // Mark notification as read
+  function markNotificationAsRead(userId) {
+    try {
+      const read = getReadNotifications();
+      if (!read.includes(userId)) {
+        read.push(userId);
+        localStorage.setItem('readNotifications', JSON.stringify(read));
+        // Reload notifications to update badge
+        loadNotifications();
+      }
+    } catch (e) {
+      console.error('Error marking notification as read:', e);
+    }
+  }
+  
+  // Make function globally accessible for onclick handlers
+  window.markNotificationAsReadNavbar = markNotificationAsRead;
+  
+  // Mark all visible notifications as read
+  function markAllNotificationsAsRead(pendingUsers) {
+    try {
+      const read = getReadNotifications();
+      pendingUsers.forEach(user => {
+        if (!read.includes(user.id)) {
+          read.push(user.id);
+        }
+      });
+      localStorage.setItem('readNotifications', JSON.stringify(read));
+    } catch (e) {
+      console.error('Error marking all notifications as read:', e);
+    }
+  }
+  
+  // Filter unread notifications
+  function getUnreadNotifications(pendingUsers) {
+    const read = getReadNotifications();
+    return pendingUsers.filter(user => !read.includes(user.id));
+  }
+  
+  // Clean up read notifications for users that are no longer pending
+  function cleanupReadNotifications(allUsers) {
+    try {
+      const read = getReadNotifications();
+      const pendingUserIds = allUsers
+        .filter(u => u.status === 'Pending')
+        .map(u => u.id);
+      
+      // Remove read notifications for users who are no longer pending
+      const cleanedRead = read.filter(userId => pendingUserIds.includes(userId));
+      
+      if (cleanedRead.length !== read.length) {
+        localStorage.setItem('readNotifications', JSON.stringify(cleanedRead));
+      }
+    } catch (e) {
+      console.error('Error cleaning up read notifications:', e);
+    }
+  }
+  
+  // Load notifications count and list
+  async function loadNotifications() {
+    try {
+      const response = await fetch('/api/auth/users', {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (response.ok) {
+        const users = await response.json();
+        // Handle both array response and object with users property
+        const usersArray = Array.isArray(users) ? users : (users.users || []);
+        
+        // Clean up read notifications for users no longer pending
+        cleanupReadNotifications(usersArray);
+        
+        const pendingUsers = usersArray.filter(u => u.status === 'Pending');
+        const unreadNotifications = getUnreadNotifications(pendingUsers);
+        
+        updateNotificationBadge(unreadNotifications);
+        updateNotificationList(pendingUsers);
+      }
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    }
+  }
+  
+  // Update notification badge with unread count (both navbar and sidebar)
+  function updateNotificationBadge(unreadNotifications) {
+    const unreadCount = unreadNotifications.length;
+    const countText = unreadCount > 99 ? '99+' : unreadCount.toString();
+    
+    // Update navbar badge
+    const notificationBadge = document.getElementById('notificationBadgeTop');
+    if (notificationBadge) {
+      if (unreadCount > 0) {
+        notificationBadge.textContent = countText;
+        notificationBadge.classList.remove('hidden');
+      } else {
+        notificationBadge.classList.add('hidden');
+      }
+    }
+    
+    // Update sidebar badge
+    const sidebarBadge = document.getElementById('notificationCount');
+    if (sidebarBadge) {
+      if (unreadCount > 0) {
+        sidebarBadge.textContent = countText;
+        sidebarBadge.classList.remove('hidden');
+      } else {
+        sidebarBadge.classList.add('hidden');
+      }
+    }
+  }
+  
+  // Update notification list
+  function updateNotificationList(pendingUsers) {
+    const notificationList = document.getElementById('notificationList');
+    if (!notificationList) return;
+    
+    const read = getReadNotifications();
+    
+    if (pendingUsers.length > 0) {
+      notificationList.innerHTML = pendingUsers.map(user => {
+        const isRead = read.includes(user.id);
+        const userEscapedId = user.id.replace(/'/g, "\\'");
+        const userName = (user.name || (user.firstName + ' ' + user.lastName) || 'Unknown').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+        const userEmail = (user.email || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+        const userRole = (user.role || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/'/g, '&#39;');
+        return `
+          <div class="p-3 border-b border-gray-100 hover:bg-gray-50 ${isRead ? 'opacity-75' : 'bg-amber-50/50'}">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                <span class="text-amber-600 text-sm">⏳</span>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-medium text-gray-900 ${isRead ? '' : 'font-semibold'}">
+                  New staff member: ${userName}
+                  ${!isRead ? '<span class="ml-2 inline-block w-2 h-2 bg-red-500 rounded-full"></span>' : ''}
+                </p>
+                <p class="text-xs text-gray-500">${userEmail} - ${userRole}</p>
+              </div>
+              <div class="flex gap-1">
+                <button onclick="approveUserFromNavbar('${userEscapedId}')" class="text-xs bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">Approve</button>
+                <button onclick="rejectUserFromNavbar('${userEscapedId}')" class="text-xs bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Reject</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      notificationList.innerHTML = `
+        <div class="p-3 text-center text-gray-500">
+          No pending notifications
+        </div>
+      `;
+    }
+  }
+  
+  // Approve/Reject functions for navbar
+  async function approveUserFromNavbar(userId) {
+    await updateUserStatusFromNavbar(userId, 'Approved');
+  }
+  
+  async function rejectUserFromNavbar(userId) {
+    await updateUserStatusFromNavbar(userId, 'Rejected');
+  }
+  
+  async function updateUserStatusFromNavbar(userId, status) {
+    try {
+      // Mark notification as read when action is taken
+      markNotificationAsRead(userId);
+      
+      // Get current user info for approvedBy field
+      const statusResponse = await fetch('/api/auth/status', { credentials: 'include' });
+      const statusData = await statusResponse.json();
+      const currentUser = statusData?.user;
+      
+      if (!currentUser || !currentUser.id) {
+        alert('Cannot identify current admin user. Please refresh the page.');
+        return;
+      }
+      
+      const response = await fetch('/api/auth/users/status', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ 
+          userId, 
+          status,
+          approvedBy: currentUser.id 
+        })
+      });
+      
+      if (response.ok) {
+        // Reload notifications after update
+        await loadNotifications();
+        // Refresh page if on staff page
+        if (window.location.pathname === '/staff') {
+          window.location.reload();
+        }
+      } else {
+        const data = await response.json();
+        alert(data.message || 'Failed to update user status');
+      }
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      alert('Error updating user status');
+    }
+  }
+  
+  // Setup notification dropdown toggle
+  (function() {
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+    
+    if (notificationBtn && notificationDropdown) {
+      notificationBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const isOpening = notificationDropdown.classList.contains('hidden');
+        notificationDropdown.classList.toggle('hidden');
+        
+        // Refresh notifications when dropdown opens
+        if (isOpening && !notificationDropdown.classList.contains('hidden')) {
+          await loadNotifications();
+          // Mark all visible notifications as read when dropdown is opened
+          const response = await fetch('/api/auth/users', {
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          if (response.ok) {
+            const users = await response.json();
+            const usersArray = Array.isArray(users) ? users : (users.users || []);
+            const pendingUsers = usersArray.filter(u => u.status === 'Pending');
+            markAllNotificationsAsRead(pendingUsers);
+            // Reload to update badge count
+            await loadNotifications();
+          }
+        }
+      });
+      
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!notificationBtn.contains(e.target) && !notificationDropdown.contains(e.target)) {
+          notificationDropdown.classList.add('hidden');
+        }
+      });
+      
+      // Close on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          notificationDropdown.classList.add('hidden');
+        }
+      });
+    }
+  })();
+  
+  async function logout(){
+    try{
+      const r = await fetch('/api/auth/logout', { method:'POST', credentials:'include' });
+      if (r.ok) window.location.href = 'http://localhost:5173/login';
+    }catch(e){}
+  }
+
+  // Also assign to the main function name
+  window.openAddContentModal = window._openAddContentModalReal;
+
+  window.closeAddContentModal = function closeAddContentModal() {
+    document.getElementById('addContentModal').classList.add('hidden');
+    document.getElementById('addContentTypeSelect').value = '';
+    document.getElementById('addContentCourseSelect').value = '';
+    document.getElementById('addContentLessonSelect').innerHTML = '<option value="">Select a lesson...</option>';
+    document.getElementById('addContentLessonSelect').disabled = true;
+  }
+
+  window.onAddContentTypeChange = async function onAddContentTypeChange() {
+    const type = document.getElementById('addContentTypeSelect').value;
+    const lessonSelect = document.getElementById('addContentLessonSelect');
+    const courseId = document.getElementById('addContentCourseSelect').value;
+    
+    if (type === 'lesson') {
+      lessonSelect.disabled = true;
+      lessonSelect.innerHTML = '<option value="">Not required for lessons</option>';
+    } else if (type === 'chapter' || type === 'quiz') {
+      if (!courseId) {
+        alert('Please select a course first');
+        document.getElementById('addContentTypeSelect').value = '';
+        return;
+      }
+      lessonSelect.disabled = false;
+      await loadLessonsForCourse(courseId);
+    }
+  }
+
+  window.onAddContentCourseChange = async function onAddContentCourseChange() {
+    const courseId = document.getElementById('addContentCourseSelect').value;
+    const type = document.getElementById('addContentTypeSelect').value;
+    const lessonSelect = document.getElementById('addContentLessonSelect');
+    
+    if (type === 'chapter' || type === 'quiz') {
+      if (courseId) {
+        lessonSelect.disabled = false;
+        await loadLessonsForCourse(courseId);
+      } else {
+        lessonSelect.disabled = true;
+        lessonSelect.innerHTML = '<option value="">Select a lesson...</option>';
+      }
+    }
+  }
+
+  async function loadLessonsForCourse(courseId) {
+    try {
+      const response = await fetch(`/api/lessons/course/${courseId}`, { credentials: 'include' });
+      const lessons = await response.ok ? await response.json() : [];
+      const lessonSelect = document.getElementById('addContentLessonSelect');
+      lessonSelect.innerHTML = '<option value="">Select a lesson...</option>' + 
+        lessons.map(l => `<option value="${l.id}">${l.title || l.id}</option>`).join('');
+    } catch (error) {
+      console.error('Error loading lessons:', error);
+      document.getElementById('addContentLessonSelect').innerHTML = '<option value="">Error loading lessons</option>';
+    }
+  }
+
+  window.proceedToAddContent = function proceedToAddContent() {
+    const courseId = document.getElementById('addContentCourseSelect').value;
+    const type = document.getElementById('addContentTypeSelect').value;
+    const lessonId = document.getElementById('addContentLessonSelect').value;
+    
+    if (!courseId) {
+      alert('Please select a course');
+      return;
+    }
+    
+    if (!type) {
+      alert('Please select content type');
+      return;
+    }
+    
+    if ((type === 'chapter' || type === 'quiz') && !lessonId) {
+      alert('Please select a lesson');
+      return;
+    }
+    
+    closeAddContentModal();
+    
+    // Navigate based on type
+    if (type === 'lesson') {
+      window.location.href = `/manage-course/${courseId}`;
+    } else if (type === 'chapter') {
+      window.location.href = `/manage-lesson/${lessonId}?action=addChapter`;
+    } else if (type === 'quiz') {
+      window.location.href = `/manage-lesson/${lessonId}?action=addQuiz`;
+    }
+  }
+</script>
+
+<!-- Add Content Modal -->
+<div id="addContentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-semibold text-gray-900">Add Content to Course</h3>
+      <button onclick="closeAddContentModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Select Course</label>
+        <select id="addContentCourseSelect" onchange="onAddContentCourseChange()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Loading courses...</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Content Type</label>
+        <select id="addContentTypeSelect" onchange="onAddContentTypeChange()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="">Select type...</option>
+          <option value="lesson">📖 Lesson</option>
+          <option value="chapter">📚 Chapter</option>
+          <option value="quiz">🧩 Quiz</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Select Lesson <span class="text-gray-500 text-xs">(required for chapters/quizzes)</span></label>
+        <select id="addContentLessonSelect" disabled class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-100">
+          <option value="">Select a lesson...</option>
+        </select>
+      </div>
+      <div class="flex justify-end gap-3 pt-4">
+        <button type="button" onclick="closeAddContentModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+        <button type="button" onclick="proceedToAddContent()" class="px-4 py-2 bg-[#4DA3FF] hover:bg-[#3B8BCC] text-white rounded-lg transition-colors">Continue</button>
+      </div>
+    </div>
+  </div>
+</div>

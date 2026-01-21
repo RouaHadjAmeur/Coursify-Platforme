@@ -1,0 +1,9 @@
+[
+  { "id": 1, "name": "Orgayulife", "email": "admin@example.com", "contact": "5646464646", "joined": "22 Aug, 2025", "role": "Manager",      "status": "Active",   "published": true  },
+  { "id": 2, "name": "Deepak",     "email": "deepak152@gmail.com","contact": "",           "joined": "22 Aug, 2025", "role": "Security Guard","status": "Inactive", "published": false },
+  { "id": 3, "name": "Rohit",      "email": "rohit@gmail.com",     "contact": "",           "joined": "22 Aug, 2025", "role": "Admin",        "status": "Inactive", "published": false },
+  { "id": 4, "name": "Admin 2",    "email": "admin12@gmail.com",   "contact": "",           "joined": "22 Aug, 2025", "role": "Admin",        "status": "Active",   "published": true  },
+  { "id": 5, "name": "Admin",      "email": "admin@gmail.com",     "contact": "360-943-7332","joined": "19 Aug, 2025","role": "Super Admin",  "status": "Active",   "published": true  },
+  { "id": 6, "name": "Marion V. Parker","email": "marion@gmail.com","contact": "713-675-8813","joined": "19 Aug, 2025","role": "Admin",       "status": "Active",   "published": true  },
+  { "id": 7, "name": "Stacey J. Meikle","email": "stacey@gmail.com","contact": "616-738-0407","joined": "19 Aug, 2025","role": "CEO",         "status": "Inactive", "published": false }
+]

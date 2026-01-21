@@ -1,0 +1,28 @@
+services:
+  # Backend Service
+  - type: web
+    name: coursify-backend
+    env: node
+    plan: free
+    buildCommand: cd backEnd && npm install
+    startCommand: cd backEnd && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        sync: false  # Will be set to frontend URL after deployment
+    healthCheckPath: /api/health
+
+  # Frontend Service
+  - type: web
+    name: coursify-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false  # Will be set to backend URL after deployment

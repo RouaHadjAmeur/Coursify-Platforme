@@ -1,0 +1,35 @@
+[
+  {
+    "id": "review_1759671329232_ol5qoq9",
+    "courseId": "course_1758895895381_1045e2wz3",
+    "userId": "demo-user",
+    "rating": 4,
+    "comment": "cool",
+    "createdAt": "2025-10-05T13:35:29.233Z"
+  },
+  {
+    "id": "review_1768766110604_5pcwtam",
+    "courseId": "course_1759673318344_oxifh0sni",
+    "userId": "demo-user",
+    "rating": 4,
+    "comment": "toppppp",
+    "createdAt": "2026-01-18T19:55:10.605Z"
+  },
+  {
+    "id": "review_1768934621893_gu8a6c5",
+    "courseId": "course_1768922877828_9ls3t5h4m",
+    "userId": "_4d5QdIP78NR_kP419pIo",
+    "rating": 4,
+    "comment": "nice course😍",
+    "createdAt": "2026-01-20T18:43:41.893Z",
+    "updatedAt": "2026-01-21T18:32:32.901Z"
+  },
+  {
+    "id": "review_1769020620115_btwkuhs",
+    "courseId": "course_1768922877828_9ls3t5h4m",
+    "userId": "h7GNck-aedfzlLt1SIw_s",
+    "rating": 2,
+    "comment": "",
+    "createdAt": "2026-01-21T18:37:00.115Z"
+  }
+]

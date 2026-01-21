@@ -1,0 +1,275 @@
+[
+  {
+    "id": "quiz_1758370854718_bacrp1r09",
+    "title": "HTML Basics Quiz",
+    "description": "",
+    "lessonId": "test_lesson_1",
+    "timeLimit": 2,
+    "passingScore": 90,
+    "questions": [
+      {
+        "question": "What does HTML stand for?",
+        "options": [
+          "Hyper Text Markup Language",
+          "Home Tool Markup Language",
+          "Hyperlinks and Text Markup Language"
+        ],
+        "correctAnswers": [
+          0
+        ],
+        "explanation": "HTML stands for Hyper Text Markup Language"
+      },
+      {
+        "question": "Which tag is used for the largest heading?",
+        "options": [
+          "<heading>",
+          "<h1>",
+          "<h6>"
+        ],
+        "correctAnswers": [
+          1
+        ],
+        "explanation": "<h1> defines the most important heading."
+      }
+    ],
+    "isPublished": true,
+    "createdAt": "2025-09-20T12:20:54.720Z"
+  },
+  {
+    "id": "quiz_1758652807270_d0aarqrkl",
+    "title": "quiz 2",
+    "description": "",
+    "lessonId": "test_lesson_1",
+    "timeLimit": 5,
+    "passingScore": 95,
+    "questions": [
+      {
+        "question": "who am i ?",
+        "options": [
+          "roua",
+          "manar ",
+          "amed"
+        ],
+        "correctAnswers": [
+          0
+        ],
+        "explanation": "my name is roua"
+      },
+      {
+        "question": "when is my b-day ?",
+        "options": [
+          "22/09/2003",
+          "23/09/2003",
+          "23/28/2002"
+        ],
+        "correctAnswers": [
+          0
+        ],
+        "explanation": ""
+      },
+      {
+        "question": "favourite song ?",
+        "options": [
+          "daylight",
+          "anty-hero",
+          "wildflower",
+          "blue"
+        ],
+        "correctAnswers": [
+          2,
+          3
+        ],
+        "explanation": "because i love bellie eilish"
+      }
+    ],
+    "placement": "end",
+    "isPublished": true,
+    "createdAt": "2025-09-23T18:40:07.272Z",
+    "updatedAt": "2025-09-23T18:40:07.270Z"
+  },
+  {
+    "id": "quiz_1758896271390_7m3i4bqth",
+    "title": "quiz 1",
+    "description": "quiiiizzzz",
+    "lessonId": "lesson_1758895928772_m8f6r0y8b",
+    "timeLimit": 30,
+    "passingScore": 80,
+    "questions": [
+      {
+        "question": "who am i ?",
+        "options": [
+          "roua",
+          "manar ",
+          "eya",
+          "asma"
+        ],
+        "correctAnswers": [
+          0
+        ],
+        "explanation": "my name is roua"
+      },
+      {
+        "question": "when is my bday",
+        "options": [
+          "22/09/2002",
+          "23/09/2003",
+          "23/08/2003",
+          "22/09/2003"
+        ],
+        "correctAnswers": [
+          3
+        ],
+        "explanation": "i was born in 22 september 2003"
+      },
+      {
+        "question": "my favourite songs ??",
+        "options": [
+          "Daylight",
+          "blue",
+          "august",
+          "born to die"
+        ],
+        "correctAnswers": [
+          0,
+          2
+        ],
+        "explanation": ""
+      }
+    ],
+    "placement": "end",
+    "isPublished": true,
+    "createdAt": "2025-09-26T14:17:51.394Z",
+    "updatedAt": "2025-10-05T13:36:04.961Z"
+  },
+  {
+    "id": "quiz_1759678007530_wlg96y8aj",
+    "title": "HTML Basics Quiz",
+    "description": "quiiiizzzz",
+    "lessonId": "lesson_1758895978069_414zfrd1o",
+    "timeLimit": 30,
+    "passingScore": 70,
+    "questions": [
+      {
+        "question": "aaaaaaaaaa",
+        "options": [
+          "aaaa",
+          "bbbb",
+          "ccc",
+          "ddd"
+        ],
+        "correctAnswers": [
+          0
+        ],
+        "explanation": ""
+      },
+      {
+        "question": "bbbbbb",
+        "options": [
+          "aaaa",
+          "bbbb",
+          "ccc",
+          "ddd"
+        ],
+        "correctAnswers": [
+          1
+        ],
+        "explanation": ""
+      }
+    ],
+    "placement": "end",
+    "isPublished": true,
+    "createdAt": "2025-10-05T15:26:47.532Z",
+    "updatedAt": "2025-10-05T15:26:47.530Z"
+  },
+  {
+    "id": "quiz_1759678476786_xge7n19yc",
+    "title": "aaaaa",
+    "description": "aaaaaaaa",
+    "lessonId": "lesson_1758895953440_xhww0efx6",
+    "timeLimit": 30,
+    "passingScore": 90,
+    "questions": [
+      {
+        "question": "aaaaaa",
+        "options": [
+          "aaaa",
+          "bbb",
+          "bbb"
+        ],
+        "correctAnswers": [
+          1,
+          2
+        ],
+        "explanation": "aaaaaaaaa"
+      }
+    ],
+    "placement": "end",
+    "isPublished": true,
+    "createdAt": "2025-10-05T15:34:36.787Z",
+    "updatedAt": "2025-10-05T15:55:11.452Z"
+  },
+  {
+    "id": "quiz_1768925056728_e2xis3lrz",
+    "title": "quiz 1",
+    "description": "",
+    "lessonId": "lesson_1768924711556_x46ccfekb",
+    "timeLimit": 10,
+    "passingScore": 90,
+    "questions": [
+      {
+        "question": "my name ?",
+        "options": [
+          "roua",
+          "rouuaaa",
+          "rourou"
+        ],
+        "correctAnswers": [
+          0
+        ],
+        "explanation": "my name is roua"
+      },
+      {
+        "question": "how old am i ?",
+        "options": [
+          "25",
+          "55",
+          "22",
+          "21"
+        ],
+        "correctAnswers": [
+          2
+        ],
+        "explanation": ""
+      },
+      {
+        "question": "am i engaged ?",
+        "options": [
+          "yes ",
+          "no"
+        ],
+        "correctAnswers": [
+          0
+        ],
+        "explanation": ""
+      },
+      {
+        "question": "what do i call my fiance ?",
+        "options": [
+          "amore",
+          "my love",
+          "honey",
+          "ahmed"
+        ],
+        "correctAnswers": [
+          0,
+          3
+        ],
+        "explanation": ""
+      }
+    ],
+    "placement": "end",
+    "isPublished": true,
+    "createdAt": "2026-01-20T16:04:16.728Z",
+    "updatedAt": "2026-01-20T19:02:04.503Z"
+  }
+]

@@ -1,0 +1,45 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependencies
+node_modules
+dist
+dist-ssr
+*.local
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# Data files (optional - uncomment if you want to keep data private)
+# backEnd/data/*.json
+# !backEnd/data/.gitkeep
+
+# Uploads (user-generated content - should not be in git)
+backEnd/uploads/*
+!backEnd/uploads/.gitkeep
+!backEnd/uploads/chapters/.gitkeep
+!backEnd/uploads/profiles/.gitkeep
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary files
+*.tmp
+.cache/
